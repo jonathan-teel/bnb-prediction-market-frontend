@@ -14,6 +14,13 @@ import {
   useState,
 } from "react";
 
+type EthereumProvider = {
+  isMetaMask?: boolean;
+  request: (args: { method: string; params?: unknown[] | Record<string, unknown> }) => Promise<any>;
+  on?: (event: string, handler: (...args: any[]) => void) => void;
+  removeListener?: (event: string, handler: (...args: any[]) => void) => void;
+};
+
 type WalletContextValue = {
   address: string | null;
   connected: boolean;
@@ -29,18 +36,12 @@ type WalletContextValue = {
 
 const WalletContext = createContext<WalletContextValue | undefined>(undefined);
 
-declare global {
-  interface Window {
-    ethereum?: {
-      isMetaMask?: boolean;
-      request: (args: { method: string; params?: unknown[] | Record<string, unknown> }) => Promise<any>;
-      on?: (event: string, handler: (...args: any[]) => void) => void;
-      removeListener?: (event: string, handler: (...args: any[]) => void) => void;
-    };
-  }
-}
-
 const DEFAULT_BNB_CHAIN_ID = "0x38"; // BNB Smart Chain Mainnet
+
+const getEthereum = (): EthereumProvider | undefined => {
+  if (typeof window === "undefined") return undefined;
+  return (window as typeof window & { ethereum?: EthereumProvider }).ethereum;
+};
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [address, setAddress] = useState<string | null>(null);
@@ -49,7 +50,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
 
-  const isMetaMask = Boolean(window?.ethereum?.isMetaMask);
+  const isMetaMask = Boolean(getEthereum()?.isMetaMask);
 
   const refreshBalance = useCallback(
     async (providerInstance: BrowserProvider | null, walletAddress: string | null) => {
@@ -76,10 +77,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const ensureProvider = useCallback(async () => {
-    if (!window?.ethereum) {
+    const ethereum = getEthereum();
+    if (!ethereum) {
       throw new Error("MetaMask (or another EVM wallet) is not available in this browser.");
     }
-    const browserProvider = new BrowserProvider(window.ethereum, "any");
+    const browserProvider = new BrowserProvider(ethereum as any, "any");
     setProvider(browserProvider);
     return browserProvider;
   }, []);
@@ -89,11 +91,15 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     setIsConnecting(true);
     try {
       const browserProvider = await ensureProvider();
-      const accounts: string[] = await window.ethereum!.request({ method: "eth_requestAccounts" });
+      const ethereum = getEthereum();
+      if (!ethereum) {
+        throw new Error("MetaMask provider unavailable after initialization.");
+      }
+      const accounts: string[] = await ethereum.request({ method: "eth_requestAccounts" });
       if (!accounts || accounts.length === 0) {
         throw new Error("No account returned from wallet.");
       }
-      const currentChainId: string = await window.ethereum!.request({ method: "eth_chainId" });
+      const currentChainId: string = await ethereum.request({ method: "eth_chainId" });
 
       setAddress(accounts[0]);
       setChainId(currentChainId);
@@ -109,25 +115,26 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
 
   const switchToBnbChain = useCallback(
     async (desiredChainId: string = DEFAULT_BNB_CHAIN_ID) => {
-      if (!window?.ethereum) {
+      const ethereum = getEthereum();
+      if (!ethereum) {
         throw new Error("MetaMask is not available.");
       }
 
-      const currentChainId: string = await window.ethereum.request({ method: "eth_chainId" });
+      const currentChainId: string = await ethereum.request({ method: "eth_chainId" });
       if (currentChainId === desiredChainId) {
         setChainId(currentChainId);
         return;
       }
 
       try {
-        await window.ethereum.request({
+        await ethereum.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: desiredChainId }],
         });
         setChainId(desiredChainId);
       } catch (switchError: any) {
         if (switchError?.code === 4902) {
-          await window.ethereum.request({
+          await ethereum.request({
             method: "wallet_addEthereumChain",
             params: [
               {
@@ -154,7 +161,8 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   );
 
   useEffect(() => {
-    if (!window?.ethereum) return;
+    const ethereum = getEthereum();
+    if (!ethereum) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
@@ -174,25 +182,26 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       });
     };
 
-    window.ethereum.on?.("accountsChanged", handleAccountsChanged);
-    window.ethereum.on?.("chainChanged", handleChainChanged);
+    ethereum.on?.("accountsChanged", handleAccountsChanged);
+    ethereum.on?.("chainChanged", handleChainChanged);
 
     return () => {
-      window.ethereum?.removeListener?.("accountsChanged", handleAccountsChanged);
-      window.ethereum?.removeListener?.("chainChanged", handleChainChanged);
+      ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
+      ethereum.removeListener?.("chainChanged", handleChainChanged);
     };
   }, [address, disconnect, provider, refreshBalance]);
 
   useEffect(() => {
     // Attempt to eagerly connect if the wallet was previously authorized.
     (async () => {
-      if (!window?.ethereum) return;
+      const ethereum = getEthereum();
+      if (!ethereum) return;
       try {
-        const accounts: string[] = await window.ethereum.request({ method: "eth_accounts" });
+        const accounts: string[] = await ethereum.request({ method: "eth_accounts" });
         if (accounts?.length) {
           const browserProvider = await ensureProvider();
           setAddress(accounts[0]);
-          const currentChainId: string = await window.ethereum.request({ method: "eth_chainId" });
+          const currentChainId: string = await ethereum.request({ method: "eth_chainId" });
           setChainId(currentChainId);
           await refreshBalance(browserProvider, accounts[0]);
         }
