@@ -79,128 +79,151 @@ export default function FundDetail() {
     }
   }
   return (
-    <div className="self-stretch px-[50px] inline-flex flex-col justify-start items-start gap-[50px] overflow-auto">
-      <div className="self-stretch inline-flex justify-start items-start gap-2 ">
-        <div className="justify-start text-[#9EA5B5] text-lg font-normal cursor-pointer font-rubic leading-relaxed">
+    <div className="w-full px-4 py-6 sm:px-6 sm:py-8 lg:px-[50px] flex flex-col gap-10 overflow-x-hidden">
+      <div className="w-full flex flex-wrap items-center gap-2 text-sm sm:text-base">
+        <div className="text-[#9EA5B5] text-sm sm:text-base lg:text-lg font-normal cursor-pointer font-rubic leading-relaxed">
           {marketField[market.marketField].name}
         </div>
-        <div className="justify-start text-[#9EA5B5] text-lg font-normal font-rubic leading-relaxed">
+        <div className="text-[#9EA5B5] text-sm sm:text-base lg:text-lg font-normal font-rubic leading-relaxed">
           {">"}
         </div>
-        <div className="justify-start text-white text-lg font-normal font-rubic leading-relaxed">
+        <div className="text-white text-sm sm:text-base lg:text-lg font-normal font-rubic leading-relaxed">
           {market.question}
         </div>
       </div>
-      <div className="self-stretch inline-flex flex-col lg:flex-row justify-start items-start gap-[50px]">
-        <div className="self-stretch inline-flex flex-col justify-start items-start gap-6">
-          <div className="self-stretch p-6 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex flex-col justify-start items-start gap-10">
-            <div className="self-stretch inline-flex justify-start items-start gap-8">
+      <div className="w-full flex flex-col lg:flex-row gap-8 lg:gap-[50px]">
+        <div className="w-full flex flex-col gap-6">
+          <div className="w-full p-5 sm:p-6 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex flex-col gap-8 sm:gap-10">
+            <div className="w-full flex flex-col 2xl:flex-row justify-start items-start gap-6 2xl:gap-8">
               <img
                 className="2xl:w-[264px] 2xl:h-[264px] xl:w-[200px] xl:h-[200px] hidden rounded-2xl"
                 src="/fund.png"
                 alt=""
               />
-              <div className="flex-1 inline-flex flex-col justify-start items-start gap-6 relative">
-                <div className="self-stretch inline-flex  justify-start items-start gap-2">
-                  <div className="flex-1 inline-flex flex-col justify-start items-start gap-2">
-                    <div className="inline-flex justify-start items-center gap-2">
-                      <div className="justify-start text-[#FCD535] text-base font-semibold font-interSemi leading-normal">
-                        {marketField[market.marketField].name}
+              <div className="flex-1 flex flex-col gap-5 sm:gap-6">
+                <div className="flex flex-col gap-3">
+                  <div className="flex w-full items-start justify-between gap-3">
+                    <div className="flex-1 flex flex-col gap-2">
+                      <div className="inline-flex items-center gap-2">
+                        <div className="text-[#FCD535] text-sm sm:text-base font-semibold font-interSemi leading-normal">
+                          {marketField[market.marketField].name}
+                        </div>
                       </div>
+                      <h1 className="text-white text-2xl sm:text-3xl lg:text-[40px] font-medium font-rubik leading-snug sm:leading-[48px]">
+                        {market.question}
+                      </h1>
                     </div>
-                    <div className="self-stretch justify-start text-white text-[40px] font-medium font-rubik leading-[48px]">
-                      {market.question}
+                    <div className="hidden sm:flex gap-1">
+                      <div
+                        data-size="Medium"
+                        data-type="Tertiary"
+                        className="cursor-pointer rounded-2xl flex items-center gap-2 px-3 py-2 bg-[#11161c] border border-[#1f242c]"
+                      >
+                        <div className="w-5 h-5 relative overflow-hidden cursor-pointer">
+                          <Icon name="Message" size={20} />
+                        </div>
+                        <div className="text-white text-sm font-medium font-satoshi leading-6">
+                          45
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="h-10 w-10 rounded-2xl border border-[#1f242c] bg-[#11161c] flex items-center justify-center"
+                      >
+                        <CiStar className="text-white text-xl" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex absolute top-0 right-0 gap-1">
+                  <div className="flex sm:hidden gap-2">
                     <div
                       data-size="Medium"
                       data-type="Tertiary"
-                      className="  cursor-pointer rounded-2xl flex justify-start items-center gap-2"
+                      className="cursor-pointer rounded-xl flex items-center gap-2 px-3 py-2 bg-[#11161c] border border-[#1f242c]"
                     >
-                      <div className="w-5 h-5 relative overflow-hidden cursor-pointer">
-                        <Icon name="Message" size={20} />
+                      <div className="w-4 h-4 relative overflow-hidden cursor-pointer">
+                        <Icon name="Message" size={16} />
                       </div>
-                      <div className="justify-start text-white text-base font-medium font-satoshi leading-7">
+                      <div className="text-white text-sm font-medium font-satoshi leading-5">
                         45
                       </div>
                     </div>
-                    <div className=" cursor-pointer rounded-2xl flex justify-center items-center gap-2">
-                      <div className="w-6 h-6 relative overflow-hidden cursor-pointer">
-                        <CiStar className="text-white font-extrabold text-[24px]" />
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      className="h-9 w-9 rounded-xl border border-[#1f242c] bg-[#11161c] flex items-center justify-center"
+                    >
+                      <CiStar className="text-white text-lg" />
+                    </button>
                   </div>
                 </div>
                 <div className="flex flex-col justify-center items-start gap-3">
-                  <div className="text-right justify-start text-[#9EA5B5] text-lg font-normal font-interSemi leading-relaxed">
+                  <div className="text-left sm:text-right text-[#9EA5B5] text-base font-normal font-interSemi leading-relaxed">
                     Expires in
                   </div>
-                  <div className="px-3 py-2 bg-[#FCD535]/10 rounded-xl inline-flex justify-start items-center gap-2">
-                    <div className="w-5 h-5 relative overflow-hidden flex justify-between items-center">
+                  <div className="px-3 py-2 bg-[#FCD535]/10 rounded-xl inline-flex items-center gap-2">
+                    <div className="w-5 h-5 relative overflow-hidden flex items-center justify-center">
                       <ImAlarm
                         color="#FCD535"
                         size={25}
                         className="flex justify-between items-center"
                       />
                     </div>
-                    <div className="justify-start text-[#FCD535] text-lg font-medium font-satoshi leading-relaxed">
+                    <div className="text-[#FCD535] text-base sm:text-lg font-medium font-satoshi leading-relaxed">
                       {counter}
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col justify-start items-start gap-1">
-                  <div className="text-right justify-start text-[#9EA5B5] text-lg font-normal font-interSemi leading-relaxed">
+                <div className="flex flex-col gap-3">
+                  <div className="text-left sm:text-right text-[#9EA5B5] text-base sm:text-lg font-normal font-interSemi leading-relaxed">
                     Initial Funding
                   </div>
-                  <div className="sm:w-[392px] w-[200px] h-[97px] p-4 bg-[#0b0e11] rounded-2xl border border-[#1f242c] flex flex-col justify-start items-start gap-4">
-                    <div className="self-stretch h-[23px] inline-flex justify-between items-center">
+                  <div className="w-full min-h-[88px] p-4 bg-[#0b0e11] rounded-2xl border border-[#1f242c] flex flex-col gap-4">
+                    <div className="w-full h-[23px] flex justify-between items-center">
                       {Array.from({ length: 20 }).map((_, index) => {
                         const filledSegments = Math.floor((market.totalInvestment / 0.1) * 20);
                         const isFilled = index < filledSegments;
                         return (
                           <div
                             key={index}
-                            className={`sm:w-[11px] w-[5px] self-stretch ${
+                            className={`sm:w-[11px] w-[6px] h-full ${
                               isFilled ? 'bg-[#FCD535]' : 'bg-[#9EA5B5]'
                             } rounded-[100px] animate-pulse [animation-delay:${index * 100}ms]`}
                           />
                         );
                       })}
                     </div>
-                    <div className="self-stretch rounded-xl inline-flex justify-between items-center">
+                    <div className="w-full rounded-xl flex justify-between items-center">
                       <div className="justify-start">
-                        <span className="text-[#FCD535] text-lg font-semibold font-interSemi leading-relaxed">
+                        <span className="text-[#FCD535] text-base sm:text-lg font-semibold font-interSemi leading-relaxed">
                           {parseFloat(Number(market.totalInvestment).toFixed(9)).toString()}
                         </span>
-                        <span className="text-[#9EA5B5] text-lg font-semibold font-interSemi leading-relaxed">
+                        <span className="text-[#9EA5B5] text-base sm:text-lg font-semibold font-interSemi leading-relaxed">
                           / 30
                         </span>
                       </div>
-                      <div className="text-right justify-start text-white text-lg font-semibold font-interSemi leading-relaxed">
+                      <div className="text-right text-white text-base sm:text-lg font-semibold font-interSemi leading-relaxed">
                         BNB Raised
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                  <div className="self-stretch justify-start text-[#9EA5B5] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="w-full flex flex-col gap-2">
+                  <div className="text-[#9EA5B5] text-base sm:text-lg font-medium font-satoshi leading-relaxed">
                     Oracle Resolver
                   </div>
-                  <div className="self-stretch justify-start text-white text-lg font-medium font-satoshi leading-relaxed">
+                  <div className="text-white text-base sm:text-lg font-medium font-satoshi leading-relaxed">
                     {marketField[market.marketField].content[market.apiType].api_name}
                   </div>
                 </div>
-                <div className="self-stretch flex flex-col justify-start items-start gap-2">
-                  <div className="self-stretch justify-start text-[#9EA5B5] text-lg font-medium font-satoshi leading-relaxed">
+                <div className="w-full flex flex-col gap-2">
+                  <div className="text-[#9EA5B5] text-base sm:text-lg font-medium font-satoshi leading-relaxed">
                     Descriptions
                   </div>
-                  <div className="self-stretch justify-start">
-                    <span className="text-white text-lg font-medium font-satoshi leading-relaxed">
+                  <div className="w-full">
+                    <span className="text-white text-base sm:text-lg font-medium font-satoshi leading-relaxed">
                       {market.description}
                     </span>
                   </div>
-                  <div className="self-stretch inline-flex justify-end">
+                  <div className="w-full flex justify-start sm:justify-end">
                     {/* <div className="flex justify-center items-end cursor-pointer gap-2">
                       <div className="justify-start text-[#FCD535] text-lg font-medium font-satoshi leading-relaxed">
                         Read more
@@ -209,7 +232,7 @@ export default function FundDetail() {
                         <GoArrowDownRight color="#FCD535" size={16} />
                       </div>
                     </div> */}
-                    <div className="text-center justify-start text-[#9EA5B5] text-sm font-medium font-satoshi">
+                    <div className="text-left sm:text-center text-[#9EA5B5] text-sm font-medium font-satoshi">
                       Note: This event are legally protected
                     </div>
                   </div>
@@ -218,20 +241,20 @@ export default function FundDetail() {
             </div>
           </div>
         </div>
-        <div className="lg:w-[440px] w-full px-6 pt-6 pb-10 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex flex-col justify-start items-center gap-8">
-          <div className="self-stretch flex flex-col justify-start items-start gap-1">
-            <div className="self-stretch inline-flex justify-start items-center gap-1">
-              <div className="justify-start text-white text-[32px] font-medium font-rubik leading-[48px]">
+        <div className="lg:w-[420px] w-full px-5 sm:px-6 pt-6 pb-8 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex flex-col items-center gap-6 sm:gap-8">
+          <div className="w-full flex flex-col gap-1">
+            <div className="w-full flex flex-wrap items-center gap-2">
+              <div className="text-white text-2xl sm:text-[32px] font-medium font-rubik leading-[36px] sm:leading-[48px]">
                 Fund
               </div>
             </div>
-            <div className="self-stretch justify-start text-[#9EA5B5] text-lg font-normal font-satoshi leading-relaxed">
+            <div className="text-[#9EA5B5] text-base sm:text-lg font-normal font-satoshi leading-relaxed">
               Start funding for this Topic
             </div>
           </div>
-          <div className="self-stretch flex flex-col justify-start items-start gap-3">
-            <div className="self-stretch inline-flex justify-start items-start gap-1">
-              <div className="justify-start text-[#9EA5B5] text-base font-medium font-satoshi leading-none">
+          <div className="w-full flex flex-col gap-3">
+            <div className="w-full flex items-center gap-1">
+              <div className="text-[#9EA5B5] text-sm sm:text-base font-medium font-satoshi leading-none">
                 Amount
               </div>
               <div className="w-4 h-4 relative overflow-hidden">
@@ -240,53 +263,51 @@ export default function FundDetail() {
             </div>
             <BnbCounter amount={fundAmount} setAmount={setAmount} />
           </div>
-          <div className="self-stretch flex flex-col justify-start items-start gap-4">
-            <div className="self-stretch inline-flex justify-between items-center">
-              <div className="justify-start text-[#9EA5B5] text-base font-medium font-satoshi leading-none">
+          <div className="w-full flex flex-col gap-4">
+            <div className="w-full flex flex-wrap justify-between items-center gap-2">
+              <div className="text-[#9EA5B5] text-sm sm:text-base font-medium font-satoshi leading-none">
                 Fund Amount
               </div>
-              <div className="justify-start text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
+              <div className="text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
                 {fundAmount} BNB
               </div>
             </div>
-            <div className="self-stretch inline-flex justify-between items-center">
-              <div className="flex justify-start items-center gap-1">
-                <div className="justify-start text-[#9EA5B5] text-base font-medium font-satoshi leading-none">
-                  Yield Rights
-                </div>
-                <div className="w-4 h-4 relative overflow-hidden">
+            <div className="w-full flex flex-wrap justify-between items-center gap-2">
+              <div className="flex items-center gap-1 text-[#9EA5B5] text-sm sm:text-base font-medium font-satoshi leading-none">
+                <span>Yield Rights</span>
+                <span className="w-4 h-4 relative overflow-hidden">
                   <GoQuestion className="text-gray font-bold" />
-                </div>
+                </span>
               </div>
-              <div className="justify-start text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
+              <div className="text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
                 {fundAmount > 0 ? ((fundAmount / (market.totalInvestment + fundAmount)) * 100).toFixed(2) : "0.00"}%
               </div>
             </div>
-            <div className="self-stretch inline-flex justify-between items-center">
-              <div className="justify-start text-[#9EA5B5] text-base font-medium font-satoshi leading-none">
+            <div className="w-full flex flex-wrap justify-between items-center gap-2">
+              <div className="text-[#9EA5B5] text-sm sm:text-base font-medium font-satoshi leading-none">
                 Gas Fee
               </div>
-              <div className="justify-start text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
+              <div className="text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
                 0.001 BNB
               </div>
             </div>
           </div>
-          <div className="self-stretch flex flex-col justify-start items-center gap-4">
+          <div className="w-full flex flex-col items-center gap-4">
             <div
               data-size="Big"
               data-type="Prime"
               onClick={() => onFund()}
-              className="self-stretch px-6 py-3.5 hover:cursor-pointer bg-[#FCD535] hover:bg-[#FCD535]/50 rounded-2xl shadow-[inset_0px_3px_0px_0px_rgba(255,255,255,0.16)] inline-flex justify-center items-center gap-2"
+              className="w-full px-6 py-3.5 hover:cursor-pointer bg-[#FCD535] hover:bg-[#FCD535]/50 rounded-2xl shadow-[inset_0px_3px_0px_0px_rgba(255,255,255,0.16)] flex justify-center items-center gap-2"
             >
-              <div className="justify-start text-[#111111] text-xl font-medium font-satoshi leading-7">
+              <div className="text-[#111111] text-lg sm:text-xl font-medium font-satoshi leading-7">
                 Fund Now
               </div>
             </div>
-            <div className="inline-flex flex-col lg:flex-row justify-start items-center gap-2">
-              <div className="justify-start text-[#9EA5B5] text-base font-normal font-satoshi leading-none">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-2 text-center sm:text-left">
+              <div className="text-[#9EA5B5] text-sm sm:text-base font-normal font-satoshi leading-none">
                 By clicking Fund you agree to
               </div>
-              <div className="justify-start text-[#FCD535] text-base font-medium font-satoshi underline leading-none">
+              <div className="text-[#FCD535] text-sm sm:text-base font-medium font-satoshi underline leading-none">
                 Terms and Conditions
               </div>
             </div>
