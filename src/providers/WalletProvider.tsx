@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  BrowserProvider,
-  formatEther,
-} from "ethers";
+import { BrowserProvider, formatEther } from "ethers";
 import {
   ReactNode,
   createContext,
@@ -11,15 +8,23 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
-type EthereumProvider = {
-  isMetaMask?: boolean;
-  request: (args: { method: string; params?: unknown[] | Record<string, unknown> }) => Promise<any>;
-  on?: (event: string, handler: (...args: any[]) => void) => void;
-  removeListener?: (event: string, handler: (...args: any[]) => void) => void;
-};
+import {
+  EthereumProvider,
+  WalletType,
+  getAvailableWalletTypes,
+  isMobileBrowser,
+  openWalletDeepLink,
+  readPreferredWallet,
+  resolveWalletProvider,
+  listAuthorizedAccounts,
+  requestAccounts,
+  requestChainId,
+  writePreferredWallet,
+} from "@/utils/wallets";
 
 type WalletContextValue = {
   address: string | null;
@@ -27,10 +32,12 @@ type WalletContextValue = {
   isConnecting: boolean;
   chainId: string | null;
   balance: string | null;
-  connect: () => Promise<void>;
+  connect: (wallet?: WalletType) => Promise<void>;
   disconnect: () => void;
   provider: BrowserProvider | null;
   isMetaMask: boolean;
+  walletType: WalletType | null;
+  availableWallets: WalletType[];
   switchToBnbChain: (desiredChainId?: string) => Promise<void>;
 };
 
@@ -38,19 +45,22 @@ const WalletContext = createContext<WalletContextValue | undefined>(undefined);
 
 const DEFAULT_BNB_CHAIN_ID = "0x38"; // BNB Smart Chain Mainnet
 
-const getEthereum = (): EthereumProvider | undefined => {
-  if (typeof window === "undefined") return undefined;
-  return (window as typeof window & { ethereum?: EthereumProvider }).ethereum;
-};
-
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [address, setAddress] = useState<string | null>(null);
   const [chainId, setChainId] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
+  const [walletType, setWalletType] = useState<WalletType | null>(null);
+  const providerRef = useRef<EthereumProvider | null>(null);
+  const [eventProvider, setEventProvider] = useState<EthereumProvider | null>(null);
 
-  const isMetaMask = Boolean(getEthereum()?.isMetaMask);
+  const availableWallets = useMemo(() => {
+    if (typeof window === "undefined") return [];
+    return getAvailableWalletTypes();
+  }, [provider, walletType, isConnecting]);
+
+  const isMetaMask = walletType === "metamask";
 
   const refreshBalance = useCallback(
     async (providerInstance: BrowserProvider | null, walletAddress: string | null) => {
@@ -74,53 +84,79 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
     setChainId(null);
     setBalance(null);
     setProvider(null);
+    setWalletType(null);
+    providerRef.current = null;
+    setEventProvider(null);
+    writePreferredWallet(null);
   }, []);
 
-  const ensureProvider = useCallback(async () => {
-    const ethereum = getEthereum();
-    if (!ethereum) {
-      throw new Error("MetaMask (or another EVM wallet) is not available in this browser.");
-    }
-    const browserProvider = new BrowserProvider(ethereum as any, "any");
-    setProvider(browserProvider);
-    return browserProvider;
-  }, []);
+  const ensureProvider = useCallback(
+    async (preferred?: WalletType) => {
+      const storedPreference = readPreferredWallet();
+      const requestedPreference = preferred ?? storedPreference ?? null;
+      const { provider: injectedProvider, walletType: resolvedType } = resolveWalletProvider(requestedPreference);
 
-  const connect = useCallback(async () => {
-    if (isConnecting) return;
-    setIsConnecting(true);
-    try {
-      const browserProvider = await ensureProvider();
-      const ethereum = getEthereum();
-      if (!ethereum) {
-        throw new Error("MetaMask provider unavailable after initialization.");
+      if (!injectedProvider || !resolvedType) {
+        if (isMobileBrowser()) {
+          openWalletDeepLink(preferred ?? "metamask");
+        }
+        throw new Error("MetaMask or Trust Wallet is not available in this browser.");
       }
-      const accounts: string[] = await ethereum.request({ method: "eth_requestAccounts" });
-      if (!accounts || accounts.length === 0) {
-        throw new Error("No account returned from wallet.");
+
+      const browserProvider = new BrowserProvider(injectedProvider as any, "any");
+      setProvider(browserProvider);
+      setWalletType(resolvedType);
+      providerRef.current = injectedProvider;
+      setEventProvider(injectedProvider);
+      writePreferredWallet(resolvedType);
+
+      return { browserProvider, injectedProvider, resolvedType };
+    },
+    []
+  );
+
+  const connect = useCallback(
+    async (preferredWallet?: WalletType) => {
+      if (isConnecting) return;
+      setIsConnecting(true);
+      try {
+        const { browserProvider, resolvedType } = await ensureProvider(preferredWallet);
+        const ethereum = providerRef.current;
+        if (!ethereum) {
+          throw new Error("Wallet provider unavailable after initialization.");
+        }
+        const accounts = await requestAccounts(ethereum);
+        const currentChainId = await requestChainId(ethereum);
+
+        setAddress(accounts[0]);
+        setChainId(currentChainId);
+        setWalletType(resolvedType ?? null);
+
+        await refreshBalance(browserProvider, accounts[0]);
+      } catch (error) {
+        console.error("Failed to connect wallet:", error);
+        disconnect();
+        throw error;
+      } finally {
+        setIsConnecting(false);
       }
-      const currentChainId: string = await ethereum.request({ method: "eth_chainId" });
-
-      setAddress(accounts[0]);
-      setChainId(currentChainId);
-
-      await refreshBalance(browserProvider, accounts[0]);
-    } catch (error) {
-      console.error("Failed to connect wallet:", error);
-      disconnect();
-    } finally {
-      setIsConnecting(false);
-    }
-  }, [disconnect, ensureProvider, isConnecting, refreshBalance]);
+    },
+    [disconnect, ensureProvider, isConnecting, refreshBalance]
+  );
 
   const switchToBnbChain = useCallback(
     async (desiredChainId: string = DEFAULT_BNB_CHAIN_ID) => {
-      const ethereum = getEthereum();
+      const ethereum =
+        providerRef.current ??
+        resolveWalletProvider(walletType ?? undefined).provider;
       if (!ethereum) {
-        throw new Error("MetaMask is not available.");
+        if (isMobileBrowser()) {
+          openWalletDeepLink(walletType ?? "metamask");
+        }
+        throw new Error("No wallet provider available.");
       }
 
-      const currentChainId: string = await ethereum.request({ method: "eth_chainId" });
+      const currentChainId: string = await requestChainId(ethereum);
       if (currentChainId === desiredChainId) {
         setChainId(currentChainId);
         return;
@@ -157,12 +193,11 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     },
-    []
+    [walletType]
   );
 
   useEffect(() => {
-    const ethereum = getEthereum();
-    if (!ethereum) return;
+    if (!eventProvider) return;
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
@@ -182,27 +217,29 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       });
     };
 
-    ethereum.on?.("accountsChanged", handleAccountsChanged);
-    ethereum.on?.("chainChanged", handleChainChanged);
+    eventProvider.on?.("accountsChanged", handleAccountsChanged);
+    eventProvider.on?.("chainChanged", handleChainChanged);
 
     return () => {
-      ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
-      ethereum.removeListener?.("chainChanged", handleChainChanged);
+      eventProvider.removeListener?.("accountsChanged", handleAccountsChanged);
+      eventProvider.removeListener?.("chainChanged", handleChainChanged);
     };
-  }, [address, disconnect, provider, refreshBalance]);
+  }, [address, disconnect, eventProvider, provider, refreshBalance]);
 
   useEffect(() => {
     // Attempt to eagerly connect if the wallet was previously authorized.
     (async () => {
-      const ethereum = getEthereum();
-      if (!ethereum) return;
+      const storedPreference = readPreferredWallet();
+      const { provider: injectedProvider } = resolveWalletProvider(storedPreference);
+      if (!injectedProvider) return;
       try {
-        const accounts: string[] = await ethereum.request({ method: "eth_accounts" });
-        if (accounts?.length) {
-          const browserProvider = await ensureProvider();
+        const accounts = await listAuthorizedAccounts(injectedProvider);
+        if (accounts.length) {
+          const { browserProvider, resolvedType } = await ensureProvider(storedPreference ?? undefined);
           setAddress(accounts[0]);
-          const currentChainId: string = await ethereum.request({ method: "eth_chainId" });
+          const currentChainId = await requestChainId(injectedProvider);
           setChainId(currentChainId);
+          setWalletType(resolvedType ?? null);
           await refreshBalance(browserProvider, accounts[0]);
         }
       } catch (error) {
@@ -222,9 +259,23 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       disconnect,
       provider,
       isMetaMask,
+      walletType,
+      availableWallets,
       switchToBnbChain,
     }),
-    [address, balance, chainId, connect, disconnect, isConnecting, isMetaMask, provider, switchToBnbChain]
+    [
+      address,
+      availableWallets,
+      balance,
+      chainId,
+      connect,
+      disconnect,
+      isConnecting,
+      isMetaMask,
+      provider,
+      switchToBnbChain,
+      walletType,
+    ]
   );
 
   return <WalletContext.Provider value={value}>{children}</WalletContext.Provider>;

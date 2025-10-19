@@ -2,13 +2,16 @@
 
 import { BrowserProvider } from "ethers";
 
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: unknown[] | Record<string, unknown> }) => Promise<any>;
-    };
-  }
-}
+import {
+  WalletType,
+  isMobileBrowser,
+  openWalletDeepLink,
+  readPreferredWallet,
+  resolveWalletProvider,
+  requestAccounts,
+  requestChainId,
+  writePreferredWallet,
+} from "@/utils/wallets";
 
 type WalletConnection = {
   provider: BrowserProvider;
@@ -23,25 +26,33 @@ export type SignaturePayload = {
   message: string;
 };
 
-const ensureWalletConnection = async (): Promise<WalletConnection> => {
-  if (typeof window === "undefined" || !window.ethereum) {
-    throw new Error("MetaMask (or another EVM-compatible wallet) is not available.");
+const ensureWalletConnection = async (
+  preferredWallet?: WalletType
+): Promise<WalletConnection> => {
+  if (typeof window === "undefined") {
+    throw new Error("Wallet connection is only available in the browser.");
   }
 
-  const provider = new BrowserProvider(window.ethereum, "any");
+  const storedPreference = readPreferredWallet();
+  const { provider: injectedProvider, walletType } = resolveWalletProvider(
+    preferredWallet ?? storedPreference ?? undefined
+  );
 
-  const accounts: string[] = await window.ethereum.request({
-    method: "eth_requestAccounts",
-  });
-  if (!accounts || accounts.length === 0) {
-    throw new Error("No account returned from wallet.");
+  if (!injectedProvider || !walletType) {
+    if (isMobileBrowser()) {
+      openWalletDeepLink(preferredWallet ?? "metamask");
+    }
+    throw new Error("MetaMask or Trust Wallet is not available.");
   }
 
-  const chainId: string = await window.ethereum.request({
-    method: "eth_chainId",
-  });
+  const provider = new BrowserProvider(injectedProvider as any, "any");
+
+  const accounts = await requestAccounts(injectedProvider);
+  const chainId = await requestChainId(injectedProvider);
   const signer = await provider.getSigner();
   const address = await signer.getAddress();
+
+  writePreferredWallet(walletType);
 
   return { provider, address, chainId };
 };
