@@ -369,11 +369,14 @@ const HeaderTop: React.FC = () => {
         <div className="fixed inset-0 z-50 flex lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 z-0 bg-black/40"
             aria-label="Close navigation overlay"
             onClick={closeMobileMenu}
           />
-          <div className="ml-auto flex h-full w-72 max-w-[85%] flex-col rounded-l-3xl border border-[#1f242c] bg-[#0d1117]/95 p-6 shadow-[0_24px_72px_-32px_rgba(8,12,20,0.95)]" ref={mobileMenuInnerRef}>
+          <div
+            className="relative z-10 ml-auto flex h-full w-72 max-w-[85%] flex-col rounded-l-3xl border border-[#1f242c] bg-[#0d1117]/95 p-6 shadow-[0_24px_72px_-32px_rgba(8,12,20,0.95)]"
+            ref={mobileMenuInnerRef}
+          >
             <div className="flex items-center justify-between">
               <Link href="/" onClick={closeMobileMenu} className="flex items-center gap-2">
                 <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#2a313a]/70 bg-[#0b0e11]">
