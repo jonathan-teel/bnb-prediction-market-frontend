@@ -13,10 +13,10 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
       <div className="relative mx-auto flex min-h-screen max-w-[1920px] flex-col">
         <HeaderTop />
-        <main className="flex-1 px-6 py-8 sm:px-10 lg:px-16">
-          <div className="relative h-full w-full overflow-hidden rounded-[28px] border border-[color:var(--border-soft)] bg-[color:var(--surface-primary)] backdrop-blur-2xl shadow-bnb-card">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(252,213,53,0.08),transparent_62%)] opacity-80" />
-            <div className="relative h-full w-full overflow-auto px-4 py-6 sm:px-8 lg:px-10 lg:py-10">
+        <main className="flex-1 px-4 py-6 sm:px-8 lg:px-16 lg:py-10">
+          <div className="relative h-full w-full rounded-3xl border border-[color:var(--border-soft)] bg-[color:var(--surface-primary)] backdrop-blur-2xl shadow-bnb-card sm:rounded-[28px]">
+            <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_top_left,rgba(252,213,53,0.08),transparent_62%)] opacity-80 sm:rounded-[28px]" />
+            <div className="relative flex h-full w-full flex-col gap-8 px-4 py-6 sm:px-8 lg:px-12 lg:py-12">
               {children}
             </div>
           </div>

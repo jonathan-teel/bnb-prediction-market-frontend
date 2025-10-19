@@ -3,26 +3,24 @@
 import FundCard from "@/components/elements/fund/FundCard";
 import Market from "@/components/elements/marketInfo/Market";
 import { useGlobalContext } from "@/providers/GlobalContext";
-import axios from "axios";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export default function FundMarket() {
   const pathname = usePathname();
-  const { setActiveTab } = useGlobalContext(); // Ensure setActiveTab exists in context
+  const { setActiveTab } = useGlobalContext();
 
   useEffect(() => {
     if (pathname === "/fund") {
-      setActiveTab("PENDING"); // Update tab
+      setActiveTab("PENDING");
     }
-  }, [pathname, setActiveTab]); // Dependency array ensures it runs on pathname change
+  }, [pathname, setActiveTab]);
 
   return (
-    <div className="self-stretch sm:px-[40px] px-5 inline-flex flex-col justify-start items-start gap-[50px] overflow-auto">
-      {/* <MarketCarousel /> */}
+    <section className="flex w-full flex-col gap-8">
       <FundCard
         title="Will Bitcoin hit 100K by April?"
-        description="This market will resolve to “Yes” if Bitcoin hits 100K by April. If not, it will resolve to “No”."
+        description="This market resolves to 'Yes' if Bitcoin hits 100K by April. Otherwise, it resolves to 'No'."
         category="Cryptocurrency"
         imageUrl="/fund.png"
         votes={45}
@@ -31,6 +29,6 @@ export default function FundMarket() {
         expiresIn="7d : 6h : 21m : 46s"
       />
       <Market />
-    </div>
+    </section>
   );
 }

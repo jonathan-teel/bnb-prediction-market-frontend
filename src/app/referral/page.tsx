@@ -78,9 +78,9 @@ export default function Referral() {
   const activeReferrals = referral?.filter(ref => ref.status === "ACTIVE").length;
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto px-6 py-12 flex flex-col gap-8">
+    <section className="mx-auto flex w-full max-w-[1200px] flex-col gap-8 px-3 py-8 sm:px-6 sm:py-10">
       {/* Stats Section */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
         <motion.div 
           whileHover={{ scale: 1.02 }}
           className="p-6 bg-gradient-to-r from-[#191d23] to-[#1f242c] rounded-xl border border-[#313131]"
@@ -112,8 +112,8 @@ export default function Referral() {
           Your Personal Referral Link
         </h2>
         <div className="h-[60px] p-2 bg-[#1a1f26] rounded-xl border border-[#313131] flex items-center gap-3">
-          <div className="flex-1 px-6 py-3 rounded-lg">
-            <div className="text-[#9EA5B5] text-xl font-medium font-satothi">
+          <div className="flex-1 rounded-lg px-4 py-3">
+            <div className="text-[#9EA5B5] text-base font-medium font-satothi sm:text-xl">
               {updating?"Updating..." : referralCode}
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function Referral() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

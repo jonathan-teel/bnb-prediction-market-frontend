@@ -22,14 +22,14 @@ export default function Home() {
   }, [pathname, setActiveTab]);
 
   return (
-    <div className="flex flex-col gap-10">
+    <>
       <DashboardHero />
 
       <section className="flex flex-col gap-6">
         <MarketCarousel />
       </section>
 
-      <section className="flex flex-col 2xl:flex-row gap-6">
+      <section className="flex flex-col gap-6 2xl:flex-row">
         <div className={`flex-1 min-w-0 ${showRecentActivity ? "2xl:pr-6" : ""}`}>
           <Market
             showRecentActivity={showRecentActivity}
@@ -37,7 +37,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="2xl:w-[420px] w-full flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4 2xl:w-[420px]">
           <div className="flex items-center justify-between rounded-2xl border border-[#1f242c] bg-[#11161c] px-5 py-4">
             <div>
               <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
@@ -62,6 +62,6 @@ export default function Home() {
           )}
         </div>
       </section>
-    </div>
+    </>
   );
 }

@@ -180,16 +180,16 @@ export default function Home() {
     })();
   }, [address]); 
   return (
-    <div className="self-stretch h-[1184px] px-[50px] flex-col lg:flex-row inline-flex justify-start items-start gap-[50px] overflow-auto">
-      <div className="lg:w-[680px] flex-col lg:flex-row p-6 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex justify-start items-start gap-4">
+    <section className="flex w-full flex-col gap-8 lg:flex-row">
+      <div className="flex w-full flex-col gap-4 rounded-2xl border border-[#1f242c] bg-[#1a1f26] p-5 shadow-[0_24px_60px_-32px_rgba(6,12,20,0.9)] lg:max-w-[680px] lg:p-6">
         {/* <img
           className="sm:w-[100px] sm:h-[100px] w-[50px] h-[50px] rounded-[10px] border border-white"
           src="https://placehold.co/100x100"
           alt=""
         /> */}
-        <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
-          <div className="self-stretch inline-flex justify-start items-start gap-4">
-            <div className="flex-1 h-[100px] inline-flex flex-col justify-center items-start gap-1">
+        <div className="flex-1 flex flex-col justify-start items-start gap-4">
+          <div className="self-stretch flex justify-start items-start gap-4">
+            <div className="flex-1 flex flex-col justify-center items-start gap-1">
               <div className="justify-start text-[#FCD535] text-[32px] font-medium font-satoshi leading-loose">
                 User One
               </div>
@@ -197,7 +197,7 @@ export default function Home() {
                 @bnbpredectionmaket
               </div> */}
             </div>
-            <div className="flex-1 h-[100px] flex justify-end items-center gap-1">
+            <div className="flex-1 flex justify-end items-center gap-1">
               <div className="px-3 py-1 rounded-[100px] border border-[#1f242c] flex justify-start items-center gap-1">
                 <div className="w-6 h-6 relative overflow-hidden">
                   <div className="w-[5.50px] h-[1.50px] left-[5px] top-[7px] absolute bg-[#9EA5B5]" />
@@ -210,8 +210,8 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="self-stretch inline-flex justify-start items-start gap-4">
-            <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
+          <div className="self-stretch flex justify-start items-start gap-4">
+            <div className="flex-1 flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
                 <div className="self-stretch justify-start text-[#9EA5B5] text-lg font-medium font-satoshi leading-relaxed">
                   {" "}
@@ -246,7 +246,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="flex-1 inline-flex flex-col justify-start items-start gap-4">
+            <div className="flex-1 flex flex-col justify-start items-start gap-4">
               <div className="flex flex-col justify-start items-start gap-1">
                 <div className="self-stretch justify-start text-[#9EA5B5] text-lg font-medium font-satoshi leading-relaxed">
                   Fees Earned From Liquidity
@@ -284,7 +284,7 @@ export default function Home() {
 
         </div>
       </div>
-      <div className="flex-1 inline-flex flex-col justify-start items-start gap-[11px]">
+      <div className="flex-1 flex flex-col justify-start items-start gap-[11px]">
         <ProfileNavbar activeTab={activeTab} onTabChange={setActiveTab} />
 
         {activeTab === "Betting History" && (
@@ -292,7 +292,7 @@ export default function Home() {
             <div className="self-stretch justify-start text-white text-[28px] font-medium font-['Rubik'] leading-[48px]">
               All Betting History
             </div>
-            <div className="self-stretch px-4 py-2 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex justify-start items-center gap-3">
+            <div className="self-stretch px-4 py-2 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex justify-start items-center gap-3">
               <div className="w-8 opacity-0 text-right justify-center text-[#9EA5B5] text-base font-medium font-satoshi leading-none">
                 St
               </div>
@@ -320,7 +320,7 @@ export default function Home() {
             <div className="self-stretch justify-start text-white text-[28px] font-medium font-['Rubik'] leading-[48px]">
               All Funded Market
             </div>
-            <div className="self-stretch px-4 py-2 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex justify-start items-center gap-3">
+            <div className="self-stretch px-4 py-2 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex justify-start items-center gap-3">
               <div className="w-8 opacity-0 text-right justify-center text-[#9EA5B5] text-base font-medium font-satoshi leading-none">
                 St
               </div>
@@ -348,7 +348,7 @@ export default function Home() {
             <div className="self-stretch justify-start text-white text-[28px] font-medium font-['Rubik'] leading-[48px]">
               All Proposed Market
             </div>
-            <div className="self-stretch px-4 py-2 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex justify-start items-center gap-3">
+            <div className="self-stretch px-4 py-2 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex justify-start items-center gap-3">
               <div className="w-8 opacity-0 text-right justify-center text-[#9EA5B5] text-base font-medium font-satoshi leading-none">
                 St
               </div>
@@ -372,7 +372,7 @@ export default function Home() {
         )}
 
       </div>
-    </div>
+    </section>
   );
 }
 
