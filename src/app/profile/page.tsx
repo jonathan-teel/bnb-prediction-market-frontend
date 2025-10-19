@@ -6,9 +6,9 @@ import ProfileProposeItem from "@/components/elements/profile/ProfileProposeItem
 import { errorAlert } from "@/components/elements/ToastGroup";
 import { url } from "@/data/data";
 import { elipsKey, stylizeFloat } from "@/utils";
-import { useWallet } from "@solana/wallet-adapter-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useWallet } from "@/providers/WalletProvider";
 
 const historyData = [
   {
@@ -161,19 +161,24 @@ export default function Home() {
   >("Betting History");
 
   const [profileData, setProfileData] = useState<any>();
-  const { publicKey } = useWallet();
+  const { address } = useWallet();
 
   useEffect(() => {
-    if (!publicKey) {
-      errorAlert("Please connect wallet!");
-      return
+    if (!address) {
+      setProfileData(null);
+      return;
     }
-    (async() =>{
-      const res = await axios.get(url + `api/profile?wallet=${publicKey.toBase58()}`);
-      
-      setProfileData(res.data);
+
+    (async () => {
+      try {
+        const res = await axios.get(url + `api/profile?wallet=${address}`);
+        setProfileData(res.data);
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+        errorAlert("Unable to load profile data. Please try again.");
+      }
     })();
-  }, [publicKey]); 
+  }, [address]); 
   return (
     <div className="self-stretch h-[1184px] px-[50px] flex-col lg:flex-row inline-flex justify-start items-start gap-[50px] overflow-auto">
       <div className="lg:w-[680px] flex-col lg:flex-row p-6 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex justify-start items-start gap-4">
@@ -200,7 +205,7 @@ export default function Home() {
                   <div className="w-[19.14px] h-[17.50px] left-[2px] top-[3px] absolute opacity-50 bg-[#9EA5B5]" />
                 </div>
                 <div className="justify-start text-[#FCD535] text-xl font-medium font-satoshi leading-relaxed">
-                  {publicKey?.toBase58() ?elipsKey(publicKey?.toBase58()):""}
+                  {address ? elipsKey(address) : ""}
                 </div>
               </div>
             </div>

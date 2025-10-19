@@ -13,16 +13,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { getCountDown } from "@/utils";
 import { depositLiquidity } from "@/components/prediction_market_sdk";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { errorAlert, infoAlert } from "@/components/elements/ToastGroup";
 import axios from "axios";
+import { useWallet } from "@/providers/WalletProvider";
 
 export default function FundDetail() {
   const { markets } = useGlobalContext(); // Ensure setActiveTab exists in context
   const [counter, setCounter] = useState("7d : 6h : 21m : 46s");
   const [fundAmount, setAmount] = useState(0);
   const router = useRouter();
-  const wallet = useWallet();
+  const { address, connected } = useWallet();
 
   if (markets.length === 0) {
     router.replace("/fund"); // Navigate to dynamic page
@@ -44,18 +44,30 @@ export default function FundDetail() {
 
   const onFund = async () => {
     try {
-      if (!wallet.connected) {
-        errorAlert("Failed funding")
-        return
+      if (!connected || !address) {
+        errorAlert("Please connect your wallet before funding.");
+        return;
       }
-      const status = await depositLiquidity({ amount: fundAmount, market_id: market.market, wallet });
-      console.log("fundAmount:", fundAmount );
-      
-      const active = status === "active" ? true : false;
 
-      console.log("status:", active);
+      if (fundAmount <= 0) {
+        errorAlert("Enter an amount greater than zero.");
+        return;
+      }
 
-      const result = await axios.post("http://localhost:8080/api/market/liquidity", { market_id: market._id, amount: fundAmount, investor: wallet.publicKey?.toBase58(), active });
+      const signaturePayload = await depositLiquidity({
+        amount: fundAmount,
+        marketId: market._id,
+      });
+
+      const result = await axios.post("http://localhost:8080/api/market/liquidity", {
+        market_id: market._id,
+        amount: fundAmount,
+        investor: address,
+        active: true,
+        signature: signaturePayload.signature,
+        signedMessage: signaturePayload.message,
+        chainId: signaturePayload.chainId,
+      });
 
       if (result.status === 200) {
         infoAlert("Funed successfully!");

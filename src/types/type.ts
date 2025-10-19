@@ -1,6 +1,3 @@
-import { TransactionInstruction, Keypair, PublicKey } from "@solana/web3.js";
-import { AnchorWallet, WalletContextState } from "@solana/wallet-adapter-react";
-
 export interface MarketCarouselItemProps {
   category: string;
   title: string;
@@ -55,43 +52,6 @@ export type GlobalSettingType = {
   marketCount: number;
   decimal: number;
   feePercentage: number;
-};
-
-export type CreateMarketType = {
-  marketID: string;
-  date: string;
-  value: number;
-  feed: Keypair;
-  wallet: WalletContextState;
-  anchorWallet: AnchorWallet;
-};
-
-export type DepositeLiquidityType = {
-  market_id: string;
-  amount: number;
-  wallet: WalletContextState;
-};
-
-export type BetType = {
-  creator: string;
-  player: AnchorWallet;
-  marketId: string;
-  amount: number;
-  isYes: boolean;
-  market: string;
-  token: string;
-};
-
-export type OracleType = {
-  creator: string;
-};
-
-export type RegistType = {
-  url: string;
-  task: string;
-  name: string;
-  wallet: AnchorWallet;
-  cluster: "Devnet" | "Mainnet";
 };
 
 export type MarketStatus = "INIT" | "PENDING" | "ACTIVE" | "CLOSED";

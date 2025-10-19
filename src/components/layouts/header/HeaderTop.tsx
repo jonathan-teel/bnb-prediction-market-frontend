@@ -2,20 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import dynamic from "next/dynamic";
 import { useMemo } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
 
 import Icon from "@/components/elements/Icons";
 import { useGlobalContext } from "@/providers/GlobalContext";
-
-const WalletMultiButtonDynamic = dynamic(
-  async () => {
-    const mod = await import("@solana/wallet-adapter-react-ui");
-    return mod.WalletMultiButton;
-  },
-  { ssr: false }
-);
+import { useWallet } from "@/providers/WalletProvider";
+import { shortenAddress } from "@/utils";
 
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Markets", href: "/" },
@@ -29,14 +21,53 @@ const NAV_LINKS: { label: string; href: string }[] = [
 const HeaderTop: React.FC = () => {
   const { activeTab, setActiveTab } = useGlobalContext();
   const pathname = usePathname();
-  const { connected } = useWallet();
+  const {
+    connected,
+    isConnecting,
+    connect,
+    disconnect,
+    address,
+    chainId,
+    switchToBnbChain,
+  } = useWallet();
+
+  const isOnBnbChain = chainId === null || chainId?.toLowerCase() === "0x38";
 
   const walletBtnClass = useMemo(
-    () => (connected ? "bnb-wallet-btn" : "bnb-wallet-btn wallet-disconnected"),
+    () =>
+      connected
+        ? "bnb-wallet-btn"
+        : "bnb-wallet-btn wallet-disconnected",
     [connected]
   );
 
   const isHome = pathname === "/";
+
+  const handleWalletClick = async () => {
+    try {
+      if (connected) {
+        disconnect();
+      } else {
+        await connect();
+      }
+    } catch (error) {
+      console.error("Wallet action failed:", error);
+    }
+  };
+
+  const handleSwitchNetwork = async () => {
+    try {
+      await switchToBnbChain();
+    } catch (error) {
+      console.error("Failed to switch network:", error);
+    }
+  };
+
+  const walletLabel = connected
+    ? shortenAddress(address ?? "")
+    : isConnecting
+      ? "Connecting..."
+      : "Connect Wallet";
 
   return (
     <header className="sticky top-0 z-40 w-full px-6 sm:px-10 lg:px-16 pt-6">
@@ -90,9 +121,28 @@ const HeaderTop: React.FC = () => {
                 </span>
                 <Icon name="Down" className="transition-transform duration-300 hover:rotate-180" />
               </div>
-              <WalletMultiButtonDynamic className={walletBtnClass} />
+              <button
+                type="button"
+                onClick={handleWalletClick}
+                className={walletBtnClass}
+              >
+                {walletLabel}
+              </button>
             </div>
           </div>
+
+          {!isOnBnbChain && (
+            <div className="flex items-center gap-3 rounded-2xl border border-[#f87171]/40 bg-[#3a1f1f]/60 px-4 py-3 text-sm text-white">
+              <span className="font-semibold uppercase tracking-[0.18em]">Network mismatch</span>
+              <button
+                type="button"
+                onClick={handleSwitchNetwork}
+                className="rounded-xl border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] transition hover:bg-white/20"
+              >
+                Switch to BNB
+              </button>
+            </div>
+          )}
 
           <div className="hidden lg:flex items-center gap-3 rounded-2xl border border-[#1f242c] bg-[#1a1f26] px-4 py-3">
             <span className="pointer-events-none">

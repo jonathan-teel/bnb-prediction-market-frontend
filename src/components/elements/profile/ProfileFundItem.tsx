@@ -1,5 +1,5 @@
-import { useWallet } from "@solana/wallet-adapter-react";
 import React, { useEffect } from "react";
+import { useWallet } from "@/providers/WalletProvider";
 
 interface ProfileFundItemProps {
   image: string;
@@ -19,14 +19,27 @@ const statusColors: Record<string, string> = {
 const ProfileFundItem = (param: any) => {
   const [betAmount, setBetAmount] = React.useState(0);
   const [percentage, setPercentage] = React.useState(0);
-  const { publicKey } = useWallet();
+  const { address } = useWallet();
+
   useEffect(() => {
-    const userFund = param.investors.find((f:any) => f.investor === publicKey?.toBase58());
-    const totalAmount = param.investors.reduce((sum:any, i:any) => sum + i.amount, 0);
-    
+    if (!address || !Array.isArray(param.investors) || param.investors.length === 0) {
+      setBetAmount(0);
+      setPercentage(0);
+      return;
+    }
+
+    const userFund = param.investors.find((f: any) => f.investor?.toLowerCase() === address.toLowerCase());
+    const totalAmount = param.investors.reduce((sum: number, investor: any) => sum + investor.amount, 0);
+
+    if (!userFund || totalAmount === 0) {
+      setBetAmount(0);
+      setPercentage(0);
+      return;
+    }
+
     setBetAmount(userFund.amount);
-    setPercentage(userFund.amount/totalAmount*100);
-  }, [])
+    setPercentage((userFund.amount / totalAmount) * 100);
+  }, [address, param.investors]);
   return (
     <div className="self-stretch p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex justify-start items-center gap-3">
       <img className="w-8 h-8 rounded-lg" src={param.imageUrl} alt="market-icon" />

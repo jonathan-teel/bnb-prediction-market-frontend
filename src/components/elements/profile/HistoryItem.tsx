@@ -1,7 +1,7 @@
 "use client";
 
-import { useWallet } from "@solana/wallet-adapter-react";
 import React, { useEffect, useState } from "react";
+import { useWallet } from "@/providers/WalletProvider";
 
 interface HistoryItemProps {
   imageUrl: string;
@@ -13,7 +13,7 @@ interface HistoryItemProps {
 }
 
 const HistoryItem = (param: any) => {
-  const { publicKey } = useWallet();
+  const { address } = useWallet();
   const [percentage, setPercentage] = useState(0);
   const [answer, setAnswer] = useState("Yes");
   const [amount, setAmount] = useState("Yes");
@@ -27,23 +27,33 @@ const HistoryItem = (param: any) => {
   // const answerColor = answer === "Yes" ? "text-[#FCD535]" : "text-[#ff6464]";
   const answerColor = "text-[#ff6464]";
   useEffect(() => {
-    let playerList = param.playerA.find((p:any) => p.player === publicKey?.toBase58());
-    let totalPlayAmount = 0;
-    if (playerList) {
-        totalPlayAmount = param.playerA.reduce((sum:any, i:any) => sum + i.amount, 0);
-    } else {
-        playerList = param.playerB.find((p:any) => p.player === publicKey?.toBase58());
-        totalPlayAmount = param.playerB.reduce((sum:any, i:any) => sum + i.amount, 0);
-        setAnswer("No")
+    if (!address || !Array.isArray(param.playerA) || !Array.isArray(param.playerB)) {
+      setAmount("0");
+      setPercentage(0);
+      return;
     }
 
-    if (!playerList) {
-        return
+    let playerList = param.playerA.find((p: any) => p.player?.toLowerCase() === address.toLowerCase());
+    let totalPlayAmount = 0;
+
+    if (playerList) {
+      totalPlayAmount = param.playerA.reduce((sum: number, i: any) => sum + i.amount, 0);
+    } else {
+      playerList = param.playerB.find((p: any) => p.player?.toLowerCase() === address.toLowerCase());
+      totalPlayAmount = param.playerB.reduce((sum: number, i: any) => sum + i.amount, 0);
+      setAnswer("No");
     }
-    const percentage = playerList?.amount / totalPlayAmount * 100;
-    setAmount(playerList?.amount);
-    setPercentage(percentage);
-  }, []);
+
+    if (!playerList || totalPlayAmount === 0) {
+      setAmount("0");
+      setPercentage(0);
+      return;
+    }
+
+    const pct = (playerList.amount / totalPlayAmount) * 100;
+    setAmount(playerList.amount);
+    setPercentage(pct);
+  }, [address, param.playerA, param.playerB]);
   return (
     <div className="self-stretch p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex justify-start items-center gap-3">
       <img className="w-8 h-8 rounded-lg" src={param.imageUrl} alt="Market Icon" />

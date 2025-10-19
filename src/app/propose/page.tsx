@@ -4,17 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { FiUpload } from "react-icons/fi";
 import { ProposeType } from "@/types/type";
 import axios from "axios";
-import { useAnchorWallet, useWallet } from "@solana/wallet-adapter-react";
 import { marketField } from "@/data/data";
-import { elipsKey, findJsonPathsForKey, isPublickey, uploadToPinata } from "@/utils";
-import { createMarket } from "@/components/prediction_market_sdk";
-import { customizeFeed } from "@/components/oracle_service/simulateFeed";
+import { elipsKey, findJsonPathsForKey, isEvmAddress, uploadToPinata } from "@/utils";
 import { errorAlert, infoAlert, warningAlert } from "@/components/elements/ToastGroup";
 import { useRouter } from "next/navigation";
 import { ClipLoader } from "react-spinners";
 import { motion } from "framer-motion";
 import { GoQuestion } from "react-icons/go";
 import Link from "next/link";
+import { useWallet } from "@/providers/WalletProvider";
 
 // Add TypeScript interfaces
 interface SportsData {
@@ -49,7 +47,7 @@ export default function Propose() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [active, setActive] = useState(true);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const wallet = useWallet()
+  const { address, connected } = useWallet();
   const [isChecked, setIsChecked] = useState(false);
   const [marketFieldIndex, setMarketFieldIndex] = useState(0);
   const [marketFieldContentIndex, setMarketFieldContentIndex] = useState(0);
@@ -59,7 +57,6 @@ export default function Propose() {
   const [marketFieldContentOpen, setMarketFieldContentOpen] = useState(false);
   const [isUploading, setUploading] = useState(false);
   const router = useRouter()
-  const anchorWallet = useAnchorWallet();
 
   // Add new state for sports selection
   const [selectedSport, setSelectedSport] = useState("");
@@ -221,10 +218,8 @@ export default function Propose() {
       setTokenDropdownOpen(true);
     } else {
       // fetch market List 
-      const isPubkey = isPublickey(e.target.value);
-      console.log(isPubkey);
-      
-      if (isPubkey) {
+      const isValidTokenAddress = isEvmAddress(e.target.value);
+      if (isValidTokenAddress) {
         setDexIndex(0);
         const result = await axios.get(marketField[marketFieldIndex].content[marketFieldContentIndex].api_link(e.target.value));
         if (result.data.pairs.length > 0) {
@@ -270,9 +265,10 @@ export default function Propose() {
       const need_key = market_detail.needed_data;
       const params = [];
 
-      if (!wallet || !wallet.publicKey || !anchorWallet) {
+      if (!connected || !address) {
         warningAlert("Please connect wallet!");
-        return
+        setActive(true);
+        return;
       }
 
       setActive(false);
@@ -311,12 +307,14 @@ export default function Propose() {
       console.log("api_link:", api_link);
       
       const response = await axios.get(api_link);
-      const task = market_detail.task(dexIndex, data.range) !== "null" ? market_detail.task(dexIndex, data.range) : findJsonPathsForKey(JSON.stringify(response.data), data.range?"market_cap" : "usd")[0];
+      const task = market_detail.task(dexIndex, data.range) !== "null"
+        ? market_detail.task(dexIndex, data.range)
+        : findJsonPathsForKey(JSON.stringify(response.data), data.range ? "market_cap" : "usd")[0];
       console.log("task:", task);
 
       data.dataLink = api_link;
       data.task = task;
-      data.creator = wallet.publicKey.toBase58() || "";
+      data.creator = address || "";
       data.marketField = marketFieldIndex;
       data.apiType = marketFieldContentIndex;
 
@@ -327,27 +325,12 @@ export default function Propose() {
         data.question = data.range? `Will ${elipsKey(data.feedName)} reach a market cap of $ ${data.value} by ${data.date}?` : `Will ${elipsKey(data.feedName)} reach a per token price of $ ${data.value} by ${data.date}?`
       }
 
-      const res = await axios.post("http://localhost:8080/api/market/create", { data, isChecked });
-      const market_id = res.data.result;
-
-      const cluster = process.env.CLUSTER === "Mainnet" ? "Mainnet" : "Devnet";
-      const feed_result = await customizeFeed({ url: data.dataLink, task, name: data.feedName, cluster, wallet: anchorWallet });
-      console.log("feed_result:", feed_result);
-
-      const create_result = await createMarket({
-        marketID: market_id,
-        date: data.date,
-        value: data.value,
-        feed: feed_result.feedKeypair!,
-        wallet,
-        anchorWallet
+      const res = await axios.post("http://localhost:8080/api/market/create", {
+        data,
+        isChecked,
       });
 
-      console.log("create result:", create_result);
-
-      const update_res = await axios.post("http://localhost:8080/api/market/add", { data: { ...create_result, id: market_id } });
-
-      if (update_res.status === 200) {
+      if (res.status === 200) {
         infoAlert("Market created successfully!");
         router.push(`/fund`);
       }

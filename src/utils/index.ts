@@ -1,4 +1,3 @@
-import { PublicKey } from "@solana/web3.js";
 import axios from "axios";
 
 const PINATA_API_KEY = "6ab09644822193eed05d";
@@ -105,15 +104,10 @@ export const formatTokenAmount = (
   return `${value.toFixed(precision)} ${symbol}`;
 };
 
-export const isPublickey = (addr: string) => {
-  try {
-    const key = new PublicKey(addr);
-    return PublicKey.isOnCurve(key.toBytes());
-  } catch (error) {
-    console.log("Invalid Address:", error);
-    return false
-  }
-}
+export const isEvmAddress = (addr: string) => {
+  if (typeof addr !== "string") return false;
+  return /^0x[a-fA-F0-9]{40}$/.test(addr.trim());
+};
 
 export function timeAgo(ms: number): string {
   const now = Date.now();
@@ -144,7 +138,7 @@ export function timeAgo(ms: number): string {
 }
 
 export function stylizeFloat(num: number) {
-  parseFloat(Number(num).toFixed(9)).toString()
+  return parseFloat(Number(num).toFixed(9)).toString();
 }
 
 export const calculateYesPercentage = (yesCount = 0, noCount = 0) => {

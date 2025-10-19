@@ -8,12 +8,11 @@ import { useState } from "react";
 import { elipsKey, getCountDown } from "@/utils";
 import { useGlobalContext } from "@/providers/GlobalContext";
 import { marketBetting } from "@/components/prediction_market_sdk";
-import { useAnchorWallet } from "@solana/wallet-adapter-react";
 import { errorAlert, infoAlert } from "../ToastGroup";
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import { MarketDataType } from "@/types/type";
 import { motion } from "framer-motion";
+import { useWallet } from "@/providers/WalletProvider";
 
 // Define types for the props
 interface PredictionCardProps {
@@ -26,8 +25,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
   currentPage
 }) => {
   const { markets, formatMarketData } = useGlobalContext(); // Use Global Context
-  const wallet = useAnchorWallet()
-  const router = useRouter()
+  const { address, connected } = useWallet();
   const [counter, setCounter] = useState("7d : 6h : 21m : 46s");
   useEffect(() => {
     const interval = setInterval(() => {
@@ -38,29 +36,30 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
     return () => clearInterval(interval);
   }, [])
 
-  const onVote = async (isYes: boolean, token: string) => {
+  const onVote = async (isYes: boolean) => {
     try {
-      if (!wallet) {
-        errorAlert("Please connect wallet!");
-        return
+      if (!connected || !address) {
+        errorAlert("Please connect your wallet before placing a bet.");
+        return;
       }
-      const result = await marketBetting({
-        creator: markets[index].creator,
-        player: wallet,
+
+      const stakeAmount = 1; // BNB amount staked (can be adjusted or made dynamic)
+
+      const signaturePayload = await marketBetting({
         marketId: markets[index]._id,
-        market: markets[index].market,
-        amount: 1000,
-        isYes: isYes,
-        token: token,
+        outcome: isYes ? "YES" : "NO",
+        amount: stakeAmount,
       });
 
       const res = await axios.post("http://localhost:8080/api/market/betting", {
-        player: wallet.publicKey.toBase58(),
+        player: address,
         market_id: markets[index]._id,
-        amount: 1000,
+        amount: stakeAmount,
         isYes,
         currentPage,
-        ...result
+        signature: signaturePayload.signature,
+        signedMessage: signaturePayload.message,
+        chainId: signaturePayload.chainId,
       });
 
       if (res.status === 200) {
@@ -138,7 +137,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="flex-1 px-4 py-2.5 bg-[#223a25] outline outline-[#FCD535] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
-          onClick={() => onVote(true, markets[index].tokenA)}
+          onClick={() => onVote(true)}
         >
           <span className="w-5 h-5 flex items-center justify-center">
             <Icon name="yes" color="#FCD535" />
@@ -149,7 +148,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="flex-1 px-4 py-2.5 bg-[#3a2222] outline outline-[#ff6464] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
-          onClick={() => onVote(false, markets[index].tokenB)}
+          onClick={() => onVote(false)}
         >
           <span className="w-5 h-5 flex items-center justify-center">
             <Icon name="no" color="#ff6464" />

@@ -7,11 +7,10 @@ import { useEffect, useState } from "react";
 import { FaUserFriends, FaCoins } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useSearchParams } from "next/navigation";
 import { url } from "@/data/data";
 import { errorAlert } from "@/components/elements/ToastGroup";
 import { ReferralType } from "@/types/type";
+import { useWallet } from "@/providers/WalletProvider";
 
 const referrals = [
   {
@@ -35,7 +34,7 @@ export default function Referral() {
   const [referralCode, setReferral] = useState("");
   const [updating, setUpdating] = useState(true);
   const [referral, setReferrals] = useState<ReferralType[] | null>([]);
-  const { publicKey } = useWallet();
+  const { address } = useWallet();
 
   const handleCopy = () => {
     navigator.clipboard.writeText(referralCode);
@@ -45,25 +44,35 @@ export default function Referral() {
   };
 
   useEffect(() => {
-    setUpdating(true);
+    const fetchReferrals = async () => {
+      if (!address) {
+        setUpdating(false);
+        return;
+      }
 
-    const ref = new URLSearchParams(window.location.search).get("ref");
-    if (!publicKey) {
-      errorAlert("Please connect wallet!");
-      return
-    }
-    (async() =>{
-      const res = await axios.post(url + "api/referral/", {
-        wallet: publicKey.toBase58(),
-        referralCode: ref? ref : ""
-      });
-      setReferral(`http://localhost:3000/referral?ref=${res.data.code}`);
-      console.log("res.data.code.referrals", res.data.referrals);
-      
-      setReferrals(res.data.referrals);
-      setUpdating(false);
-    })();
-  }, [publicKey]); 
+      try {
+        setUpdating(true);
+        const ref = typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("ref")
+          : null;
+
+        const res = await axios.post(url + "api/referral/", {
+          wallet: address,
+          referralCode: ref ?? "",
+        });
+
+        setReferral(`http://localhost:3000/referral?ref=${res.data.code}`);
+        setReferrals(res.data.referrals);
+      } catch (error) {
+        console.error("Failed to fetch referrals:", error);
+        errorAlert("Unable to load referral data. Please try again.");
+      } finally {
+        setUpdating(false);
+      }
+    };
+
+    fetchReferrals();
+  }, [address]);
 
   // const totalEarnings = referrals.reduce((sum, ref) => sum + parseFloat(ref.amount), 0);
   const activeReferrals = referral?.filter(ref => ref.status === "ACTIVE").length;

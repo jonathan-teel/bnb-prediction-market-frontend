@@ -1,7 +1,5 @@
 import { IconName } from "@/components/elements/Icons/Icons";
 import type { Metadata } from "next";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import BN from "bn.js";
 
 export const categories = [
   { name: "Trending", active: true, icon: "Trending" as IconName, color: "#FCD535" },
@@ -162,17 +160,4 @@ export const marketField = [
     ]
   }
 ]
-
-export const marketConfig = {
-  range: 0,
-  tokenAmount: new BN(1000000000),
-  tokenPrice: new BN(0.00001 * LAMPORTS_PER_SOL),
-  nameA: "AToken",
-  nameB: "BToken",
-  symbolA: "A",
-  symbolB: "B",
-  urlA: "https://tokena",
-  urlB: "https://tokenb",
-}
-
 
