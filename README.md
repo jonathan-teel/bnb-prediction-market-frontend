@@ -20,6 +20,18 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Environment configuration
+
+For on-chain interactions you should expose the BSC network details through environment variables (values below show the current testnet defaults):
+
+```
+NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS=0xbFE71302361596be1F789fd789ad4eaF7cb63913
+NEXT_PUBLIC_CHAIN_ID=0x61
+NEXT_PUBLIC_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545
+```
+
+When switching to a different deployment update these values and restart the dev server so the dapp points at the right network.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

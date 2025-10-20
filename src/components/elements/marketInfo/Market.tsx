@@ -7,6 +7,7 @@ import PendingCard from "./PendingCard";
 import Navbar from "../Navbar";
 import axios, { AxiosResponse } from "axios";
 import { usePathname } from "next/navigation";
+import { API_BASE_URL } from "@/config/api";
 
 interface MarketProps {
   showRecentActivity?: boolean;
@@ -31,10 +32,15 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
           headers: new axios.AxiosHeaders()
         }
       };
+      const fieldQuery = selectedCategory === "Sports" ? 1 : 0;
       if (pathname === "/fund") {
-        marketData = await axios.get(`http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=PENDING&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
+        marketData = await axios.get(
+          `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=PENDING&marketField=${fieldQuery}`
+        );
       } else if (pathname === "/") {
-        marketData = await axios.get(`http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${selectedCategory === "Sports" ? 1 : 0}`);
+        marketData = await axios.get(
+          `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${fieldQuery}`
+        );
       }
 
       if (marketData.data?.total !== undefined) {

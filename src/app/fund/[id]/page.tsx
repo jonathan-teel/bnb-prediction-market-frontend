@@ -16,6 +16,8 @@ import { depositLiquidity } from "@/components/prediction_market_sdk";
 import { errorAlert, infoAlert } from "@/components/elements/ToastGroup";
 import axios from "axios";
 import { useWallet } from "@/providers/WalletProvider";
+import { TARGET_NETWORK } from "@/config/network";
+import { API_BASE_URL } from "@/config/api";
 
 export default function FundDetail() {
   const { markets } = useGlobalContext(); // Ensure setActiveTab exists in context
@@ -54,30 +56,47 @@ export default function FundDetail() {
         return;
       }
 
-      const signaturePayload = await depositLiquidity({
-        amount: fundAmount,
-        marketId: market._id,
-      });
+      const marketIdentifier =
+        (market as any)?.onChainId ??
+        (market as any)?.marketId ??
+        (Number.isFinite(index) ? index + 1 : undefined);
 
-      const result = await axios.post("http://localhost:8080/api/market/liquidity", {
-        market_id: market._id,
-        amount: fundAmount,
-        investor: address,
-        active: true,
-        signature: signaturePayload.signature,
-        signedMessage: signaturePayload.message,
-        chainId: signaturePayload.chainId,
-      });
-
-      if (result.status === 200) {
-        infoAlert("Funed successfully!");
-        router.replace(`/fund`);
+      if (marketIdentifier === undefined || marketIdentifier === null) {
+        errorAlert("Unable to resolve on-chain market identifier.");
+        return;
       }
+
+      const txResult = await depositLiquidity({
+        amount: fundAmount,
+        marketId: marketIdentifier,
+      });
+
+      infoAlert(
+        `Funding submitted on-chain! Tx: ${shortenAddress(txResult.hash)}`
+      );
+
+      try {
+        await axios.post(`${API_BASE_URL}/market/liquidity`, {
+          market_id: market._id,
+          onChainId: marketIdentifier,
+          amount: fundAmount,
+          investor: address,
+          active: true,
+          signature: txResult.hash,
+          signedMessage: txResult.hash,
+          txHash: txResult.hash,
+          chainId: txResult.chainId,
+        });
+      } catch (apiError) {
+        console.warn("Liquidity API sync failed:", apiError);
+      }
+
+      router.replace(`/fund`);
     } catch (error) {
-      console.error('Unexpected error:', error);
-      errorAlert("Failed deploying fund!")
+      console.error("Liquidity funding failed:", error);
+      errorAlert("Funding transaction failed.");
     }
-  }
+  };
   return (
     <div className="w-full px-4 py-6 sm:px-6 sm:py-8 lg:px-[50px] flex flex-col gap-10 overflow-x-hidden">
       <div className="w-full flex flex-wrap items-center gap-2 text-sm sm:text-base">
@@ -201,7 +220,7 @@ export default function FundDetail() {
                         </span>
                       </div>
                       <div className="text-right text-white text-base sm:text-lg font-semibold font-interSemi leading-relaxed">
-                        BNB Raised
+                        {TARGET_NETWORK.nativeCurrency.symbol} Raised
                       </div>
                     </div>
                   </div>
@@ -269,7 +288,7 @@ export default function FundDetail() {
                 Fund Amount
               </div>
               <div className="text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
-                {fundAmount} BNB
+                {fundAmount} {TARGET_NETWORK.nativeCurrency.symbol}
               </div>
             </div>
             <div className="w-full flex flex-wrap justify-between items-center gap-2">
@@ -288,7 +307,7 @@ export default function FundDetail() {
                 Gas Fee
               </div>
               <div className="text-[#9EA5B5] text-base font-bold font-satoshi leading-none">
-                0.001 BNB
+                0.001 {TARGET_NETWORK.nativeCurrency.symbol}
               </div>
             </div>
           </div>

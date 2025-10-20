@@ -25,6 +25,7 @@ import {
   requestChainId,
   writePreferredWallet,
 } from "@/utils/wallets";
+import { TARGET_CHAIN_ID, TARGET_NETWORK } from "@/config/network";
 
 type WalletContextValue = {
   address: string | null;
@@ -38,12 +39,11 @@ type WalletContextValue = {
   isMetaMask: boolean;
   walletType: WalletType | null;
   availableWallets: WalletType[];
+  targetChainId: string;
   switchToBnbChain: (desiredChainId?: string) => Promise<void>;
 };
 
 const WalletContext = createContext<WalletContextValue | undefined>(undefined);
-
-const DEFAULT_BNB_CHAIN_ID = "0x38"; // BNB Smart Chain Mainnet
 
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
   const [address, setAddress] = useState<string | null>(null);
@@ -145,7 +145,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const switchToBnbChain = useCallback(
-    async (desiredChainId: string = DEFAULT_BNB_CHAIN_ID) => {
+    async (desiredChainId: string = TARGET_CHAIN_ID) => {
       const ethereum =
         providerRef.current ??
         resolveWalletProvider(walletType ?? undefined).provider;
@@ -175,14 +175,10 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
             params: [
               {
                 chainId: desiredChainId,
-                chainName: "BNB Smart Chain",
-                nativeCurrency: {
-                  name: "BNB",
-                  symbol: "BNB",
-                  decimals: 18,
-                },
-                rpcUrls: ["https://bsc-dataseed.binance.org"],
-                blockExplorerUrls: ["https://bscscan.com"],
+                chainName: TARGET_NETWORK.chainName,
+                nativeCurrency: TARGET_NETWORK.nativeCurrency,
+                rpcUrls: TARGET_NETWORK.rpcUrls,
+                blockExplorerUrls: TARGET_NETWORK.blockExplorerUrls,
               },
             ],
           });
@@ -260,6 +256,7 @@ export const WalletProvider = ({ children }: { children: ReactNode }) => {
       provider,
       isMetaMask,
       walletType,
+      targetChainId: TARGET_CHAIN_ID,
       availableWallets,
       switchToBnbChain,
     }),

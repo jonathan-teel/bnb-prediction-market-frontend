@@ -1,6 +1,6 @@
 "use client";
 
-import { BrowserProvider } from "ethers";
+import { BrowserProvider, Contract, parseEther } from "ethers";
 
 import {
   WalletType,
@@ -12,6 +12,12 @@ import {
   requestChainId,
   writePreferredWallet,
 } from "@/utils/wallets";
+import {
+  PREDICTION_MARKET_ABI,
+  PREDICTION_MARKET_ADDRESS,
+  TARGET_EXPLORER_BASE,
+} from "@/config/predictionMarket";
+import { TARGET_CHAIN_ID, TARGET_NETWORK } from "@/config/network";
 
 type WalletConnection = {
   provider: BrowserProvider;
@@ -19,11 +25,11 @@ type WalletConnection = {
   chainId: string;
 };
 
-export type SignaturePayload = {
-  signature: string;
+export type ContractTxResult = {
+  hash: string;
   address: string;
   chainId: string;
-  message: string;
+  explorerUrl: string;
 };
 
 const ensureWalletConnection = async (
@@ -57,54 +63,83 @@ const ensureWalletConnection = async (
   return { provider, address, chainId };
 };
 
-const signMessage = async (message: string): Promise<SignaturePayload> => {
-  const { provider, address, chainId } = await ensureWalletConnection();
-  const signer = await provider.getSigner();
-  const signature = await signer.signMessage(message);
+const getContract = (provider: BrowserProvider) =>
+  new Contract(PREDICTION_MARKET_ADDRESS, PREDICTION_MARKET_ABI, provider);
 
-  return {
-    signature,
-    address,
-    chainId,
-    message,
-  };
+const assertTargetNetwork = (chainId: string) => {
+  if (chainId.toLowerCase() !== TARGET_CHAIN_ID) {
+    throw new Error(`Please switch your wallet to ${TARGET_NETWORK.chainName}.`);
+  }
+};
+
+const normalizeMarketId = (marketId: string | number | bigint): bigint => {
+  try {
+    return BigInt(marketId);
+  } catch (error) {
+    throw new Error("Invalid market identifier supplied.");
+  }
 };
 
 export const depositLiquidity = async ({
   amount,
   marketId,
+  preferredWallet,
 }: {
   amount: number;
-  marketId: string;
-}): Promise<SignaturePayload> => {
-  const message = [
-    "Prediction Market Liquidity Deposit",
-    `Market: ${marketId}`,
-    `Amount (BNB): ${amount}`,
-    `Timestamp: ${Date.now()}`,
-  ].join("\n");
+  marketId: string | number | bigint;
+  preferredWallet?: WalletType;
+}): Promise<ContractTxResult> => {
+  const { provider, address, chainId } = await ensureWalletConnection(preferredWallet);
+  assertTargetNetwork(chainId);
+  const signer = await provider.getSigner();
+  const contract = getContract(provider).connect(signer);
 
-  return signMessage(message);
+  const normalizedAmount = parseEther(amount.toString());
+  const normalizedMarketId = normalizeMarketId(marketId);
+
+  const tx = await contract.provideLiquidity(normalizedMarketId, {
+    value: normalizedAmount,
+  });
+  await tx.wait();
+
+  return {
+    hash: tx.hash,
+    address,
+    chainId,
+    explorerUrl: `${TARGET_EXPLORER_BASE}${tx.hash}`,
+  };
 };
 
 export const marketBetting = async ({
   marketId,
   outcome,
   amount,
+  preferredWallet,
 }: {
-  marketId: string;
+  marketId: string | number | bigint;
   outcome: "YES" | "NO";
   amount: number;
-}): Promise<SignaturePayload> => {
-  const message = [
-    "Prediction Market Bet",
-    `Market: ${marketId}`,
-    `Outcome: ${outcome}`,
-    `Stake (BNB): ${amount}`,
-    `Timestamp: ${Date.now()}`,
-  ].join("\n");
+  preferredWallet?: WalletType;
+}): Promise<ContractTxResult> => {
+  const { provider, address, chainId } = await ensureWalletConnection(preferredWallet);
+  assertTargetNetwork(chainId);
+  const signer = await provider.getSigner();
+  const contract = getContract(provider).connect(signer);
 
-  return signMessage(message);
+  const normalizedMarketId = normalizeMarketId(marketId);
+  const stake = parseEther(amount.toString());
+
+  const tx = await contract.placeBet(normalizedMarketId, outcome === "YES", {
+    value: stake,
+  });
+  await tx.wait();
+
+  return {
+    hash: tx.hash,
+    address,
+    chainId,
+    explorerUrl: `${TARGET_EXPLORER_BASE}${tx.hash}`,
+  };
 };
 
 export const ensureWallet = async () => ensureWalletConnection();

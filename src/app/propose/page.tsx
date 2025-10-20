@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { GoQuestion } from "react-icons/go";
 import Link from "next/link";
 import { useWallet } from "@/providers/WalletProvider";
+import { API_BASE_URL } from "@/config/api";
 
 // Add TypeScript interfaces
 interface SportsData {
@@ -325,7 +326,7 @@ export default function Propose() {
         data.question = data.range? `Will ${elipsKey(data.feedName)} reach a market cap of $ ${data.value} by ${data.date}?` : `Will ${elipsKey(data.feedName)} reach a per token price of $ ${data.value} by ${data.date}?`
       }
 
-      const res = await axios.post("http://localhost:8080/api/market/create", {
+      const res = await axios.post(`${API_BASE_URL}/market/create`, {
         data,
         isChecked,
       });

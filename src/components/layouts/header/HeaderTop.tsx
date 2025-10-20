@@ -9,6 +9,7 @@ import { useGlobalContext } from "@/providers/GlobalContext";
 import { useWallet } from "@/providers/WalletProvider";
 import { shortenAddress } from "@/utils";
 import type { WalletType } from "@/utils/wallets";
+import { TARGET_NETWORK } from "@/config/network";
 
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Markets", href: "/" },
@@ -32,13 +33,14 @@ const HeaderTop: React.FC = () => {
     switchToBnbChain,
     walletType,
     availableWallets,
+    targetChainId,
   } = useWallet();
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const walletMenuRef = useRef<HTMLDivElement | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuInnerRef = useRef<HTMLDivElement | null>(null);
 
-  const isOnBnbChain = chainId === null || chainId?.toLowerCase() === "0x38";
+  const isOnBnbChain = chainId === null || chainId?.toLowerCase() === targetChainId;
 
   const walletBtnClass = useMemo(
     () =>
@@ -299,7 +301,7 @@ const HeaderTop: React.FC = () => {
                 onClick={handleSwitchNetwork}
                 className="rounded-xl border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] transition hover:bg-white/20"
               >
-                Switch to BNB
+                Switch to {TARGET_NETWORK.nativeCurrency.symbol}
               </button>
             </div>
           )}
@@ -438,7 +440,7 @@ const HeaderTop: React.FC = () => {
                 }}
                 className="w-full rounded-2xl border border-[#1f242c] bg-[#15191f] px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#9EA5B5] transition hover:border-[#2a313a] hover:bg-[#181d25] hover:text-white"
               >
-                Switch To BNB
+                Switch To {TARGET_NETWORK.nativeCurrency.symbol}
               </button>
             </div>
           </div>

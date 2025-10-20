@@ -5,7 +5,7 @@ import { FaRegClock, FaRegStar } from "react-icons/fa6";
 import Icon from "../Icons";
 import ProgressBar from "./ProgressBar";
 import { useState } from "react";
-import { elipsKey, getCountDown } from "@/utils";
+import { elipsKey, getCountDown, shortenAddress } from "@/utils";
 import { useGlobalContext } from "@/providers/GlobalContext";
 import { marketBetting } from "@/components/prediction_market_sdk";
 import { errorAlert, infoAlert } from "../ToastGroup";
@@ -13,6 +13,7 @@ import axios from "axios";
 import { MarketDataType } from "@/types/type";
 import { motion } from "framer-motion";
 import { useWallet } from "@/providers/WalletProvider";
+import { API_BASE_URL } from "@/config/api";
 
 // Define types for the props
 interface PredictionCardProps {
@@ -45,31 +46,47 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
 
       const stakeAmount = 1; // BNB amount staked (can be adjusted or made dynamic)
 
-      const signaturePayload = await marketBetting({
-        marketId: markets[index]._id,
+      const marketIdentifier =
+        (markets[index] as any)?.onChainId ??
+        (markets[index] as any)?.marketId ??
+        (Number.isFinite(index) ? index + 1 : undefined);
+
+      if (marketIdentifier === undefined || marketIdentifier === null) {
+        errorAlert("Unable to resolve on-chain market identifier.");
+        return;
+      }
+
+      const txResult = await marketBetting({
+        marketId: marketIdentifier,
         outcome: isYes ? "YES" : "NO",
         amount: stakeAmount,
       });
 
-      const res = await axios.post("http://localhost:8080/api/market/betting", {
-        player: address,
-        market_id: markets[index]._id,
-        amount: stakeAmount,
-        isYes,
-        currentPage,
-        signature: signaturePayload.signature,
-        signedMessage: signaturePayload.message,
-        chainId: signaturePayload.chainId,
-      });
+      infoAlert(`Bet placed! Tx: ${shortenAddress(txResult.hash)}`);
 
-      if (res.status === 200) {
-        infoAlert("Successfully betted!");
-        const marketData = await axios.get(`http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=0`);
-        formatMarketData(marketData.data.data);
+      try {
+        await axios.post(`${API_BASE_URL}/market/betting`, {
+          player: address,
+          market_id: markets[index]._id,
+          onChainId: marketIdentifier,
+          amount: stakeAmount,
+          isYes,
+          currentPage,
+          signature: txResult.hash,
+          signedMessage: txResult.hash,
+          txHash: txResult.hash,
+          chainId: txResult.chainId,
+        });
+        const marketData = await axios.get(
+          `http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=0`
+        );
+        formatMarketData(marketData.data.data as MarketDataType[]);
+      } catch (apiError) {
+        console.warn("Betting API sync failed:", apiError);
       }
     } catch (error) {
       console.log(error);
-      errorAlert("Betting Filed!")
+      errorAlert("Betting transaction failed.");
     }
   }
   return (
@@ -161,7 +178,6 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
 };
 
 export default PredictionCard;
-
 
 
 
