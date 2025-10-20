@@ -1,5 +1,6 @@
 import { IconName } from "@/components/elements/Icons/Icons";
 import type { Metadata } from "next";
+import { API_BASE_URL } from "@/config/api";
 
 export const categories = [
   { name: "Trending", active: true, icon: "Trending" as IconName, color: "#FCD535" },
@@ -8,7 +9,7 @@ export const categories = [
   { name: "News", active: false, icon: "News" as IconName, color: "#9EA5B5" },
 ];
 
-export const url = "http://localhost:8080/"
+export const url = API_BASE_URL;
 
 export const metadata: Metadata = {
   title: "BnbPredectionMaket",

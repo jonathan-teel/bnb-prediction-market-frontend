@@ -77,8 +77,9 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
           txHash: txResult.hash,
           chainId: txResult.chainId,
         });
+        const fieldQuery = markets[index]?.marketField ?? 0;
         const marketData = await axios.get(
-          `http://localhost:8080/api/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=0`
+          `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${fieldQuery}`
         );
         formatMarketData(marketData.data.data as MarketDataType[]);
       } catch (apiError) {

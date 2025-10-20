@@ -28,6 +28,7 @@ For on-chain interactions you should expose the BSC network details through envi
 NEXT_PUBLIC_PREDICTION_MARKET_ADDRESS=0xbFE71302361596be1F789fd789ad4eaF7cb63913
 NEXT_PUBLIC_CHAIN_ID=0x61
 NEXT_PUBLIC_RPC_URL=https://data-seed-prebsc-1-s1.binance.org:8545
+NEXT_PUBLIC_API_URL=http://localhost:9000/api
 ```
 
 When switching to a different deployment update these values and restart the dev server so the dapp points at the right network.
