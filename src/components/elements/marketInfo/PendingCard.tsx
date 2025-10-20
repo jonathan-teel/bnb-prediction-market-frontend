@@ -2,22 +2,19 @@
 
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { FaRegStar } from "react-icons/fa6";
 import Icon from "../Icons";
 import { GiAlarmClock } from "react-icons/gi";
 import { useRouter } from "next/navigation";
 import { elipsKey, getCountDown } from "@/utils";
 import { motion } from "framer-motion";
-import { Content } from "next/font/google";
 
 // Define types for the props
 interface PendingCardProps {
   category: string;
   question: string;
+  imageUrl: string;
   volume: number;
   timeLeft: string;
-  comments: number;
-  imageUrl: string;
   index: number;
 }
 
@@ -25,7 +22,6 @@ const PendingCard: React.FC<PendingCardProps> = ({
   index,
   category,
   question,
-  comments,
   imageUrl,
   volume,
   timeLeft,
@@ -60,17 +56,6 @@ const PendingCard: React.FC<PendingCardProps> = ({
           <div className="flex-1 justify-start text-[#FCD535] lg:text-base text-xs font-semibold font-Inter">
             {elipsKey(category)}
           </div>
-          <div className="flex justify-start items-center gap-1">
-            <div className="w-5 h-5 relative overflow-hidden">
-              <Icon name="Message" />
-            </div>
-            <div className="justify-start text-[#9EA5B5] text-sm font-semibold font-interSemi leading-tight">
-              {comments}
-            </div>
-          </div>
-          <div className="lg:w-5 lg:h-5 w-4 h-4 relative overflow-hidden">
-            <FaRegStar className="text-white" />
-          </div>
         </div>
         <div className="self-stretch inline-flex justify-start items-start gap-4">
           <div className="flex-1 lg:h-[96px] h-[80px] text-wrap justify-start text-white lg:text-lg text-lg font-medium font-rubik leading-loose">
@@ -83,7 +68,7 @@ const PendingCard: React.FC<PendingCardProps> = ({
           {/* Left: Funding info */}
           <div className="flex flex-col gap-1 w-1/2">
             <div className="text-[#9EA5B5] text-sm font-semibold">Funding</div>
-            <div className="text-white text-sm font-semibold">{volume.toFixed(4)} / 30 BNB</div>
+            <div className="text-white text-sm font-semibold">{volume.toFixed(4)} / 0.001 BNB</div>
             <div className="text-[#9EA5B5] text-xs font-semibold"></div>
           </div>
           {/* Right: Time Remaining and Progress Bar */}
@@ -97,11 +82,11 @@ const PendingCard: React.FC<PendingCardProps> = ({
             <div className="mt-2 flex items-center gap-2 w-full max-w-[180px]">
               {/* Percentage (clamped to 100%) */}
               <span className="text-[#FCD535] text-xs font-semibold min-w-[38px] text-right">
-                {Math.min(100, Math.floor((volume / 0.1) * 100))}%
+                {Math.min(100, Math.floor((volume / 0.001) * 100))}%
               </span>
               <div className="flex-1 flex items-center gap-[3px] h-[12px]">
                 {Array.from({ length: 20 }).map((_, index) => {
-                  const percent = Math.min(1, volume / 0.1);
+                  const percent = Math.min(1, volume / 0.001);
                   const filledSegments = Math.round(percent * 20);
                   const isFilled = index < filledSegments;
                   // Determine color for all filled blocks based on overall percent

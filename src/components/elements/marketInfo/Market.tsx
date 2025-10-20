@@ -107,10 +107,9 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
               index={markets.indexOf(prediction)}
               category={prediction.feedName}
               question={prediction.question}
+              imageUrl={prediction.imageUrl}
               volume={prediction.totalInvestment}
               timeLeft={prediction.date}
-              comments={0}
-              imageUrl={prediction.imageUrl}
             />
           )
         )}
