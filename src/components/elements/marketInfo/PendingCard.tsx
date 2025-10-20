@@ -49,37 +49,39 @@ const PendingCard: React.FC<PendingCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.025, boxShadow: "0 8px 32px 0 rgba(7,179,255,0.10)" }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="lg:p-6 p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] shadow-[0_24px_48px_-36px_rgba(6,12,20,0.65)] inline-flex flex-col justify-start items-start lg:gap-6 gap-4"
+      className="w-full lg:p-6 p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] shadow-[0_24px_48px_-36px_rgba(6,12,20,0.65)] flex flex-col justify-start items-start lg:gap-6 gap-4"
     >
       <div className="self-stretch flex flex-col justify-start items-start gap-6">
-        <div className="self-stretch inline-flex justify-start items-center gap-2">
+        <div className="self-stretch flex justify-start items-center gap-2">
           <div className="flex-1 justify-start text-[#FCD535] lg:text-base text-xs font-semibold font-Inter">
             {elipsKey(category)}
           </div>
         </div>
-        <div className="self-stretch inline-flex justify-start items-start gap-4">
-          <div className="flex-1 lg:h-[96px] h-[80px] text-wrap justify-start text-white lg:text-lg text-lg font-medium font-rubik leading-loose">
+        <div className="self-stretch flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div className="flex-1 text-white lg:text-lg text-base font-medium font-rubik leading-relaxed">
             {question}
           </div>
-          <img className="lg:w-14 lg:h-14 w-12 h-12 rounded-lg" src={imageUrl} alt={category} />
+          <div className="flex-shrink-0">
+            <img className="lg:w-14 lg:h-14 w-12 h-12 rounded-lg object-cover" src={imageUrl} alt={category} />
+          </div>
         </div>
         {/* Market Stats */}
-        <div className="self-stretch flex justify-between items-start gap-4">
+        <div className="self-stretch grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Left: Funding info */}
-          <div className="flex flex-col gap-1 w-1/2">
+          <div className="flex flex-col gap-1">
             <div className="text-[#9EA5B5] text-sm font-semibold">Funding</div>
             <div className="text-white text-sm font-semibold">{volume.toFixed(4)} / 0.001 BNB</div>
             <div className="text-[#9EA5B5] text-xs font-semibold"></div>
           </div>
           {/* Right: Time Remaining and Progress Bar */}
-          <div className="flex flex-col gap-1 items-end w-full">
+          <div className="flex flex-col gap-1 items-start sm:items-end">
             <div className="text-[#9EA5B5] text-sm font-semibold">Time Remaining</div>
-            <div className="text-[#FCD535] text-sm font-semibold flex items-center gap-1">
+            <div className="text-[#FCD535] text-sm font-semibold flex items-center gap-1 flex-wrap">
               <GiAlarmClock className="text-[#FCD535]" />
               {counter}
             </div>
             {/* Progress Bar (fills container, 20 blocks, even spacing, visible unfilled) */}
-            <div className="mt-2 flex items-center gap-2 w-full max-w-[180px]">
+            <div className="mt-2 flex items-center gap-2 w-full max-w-[220px]">
               {/* Percentage (clamped to 100%) */}
               <span className="text-[#FCD535] text-xs font-semibold min-w-[38px] text-right">
                 {Math.min(100, Math.floor((volume / 0.001) * 100))}%

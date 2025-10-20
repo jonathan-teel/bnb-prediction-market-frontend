@@ -96,34 +96,32 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.025, boxShadow: "0 8px 32px 0 rgba(7,179,255,0.10)" }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="lg:p-6 p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] shadow-[0_24px_48px_-36px_rgba(6,12,20,0.65)] inline-flex flex-col justify-start items-start lg:gap-6 gap-4"
+      className="w-full lg:p-6 p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] shadow-[0_24px_48px_-36px_rgba(6,12,20,0.65)] flex flex-col justify-start items-start lg:gap-6 gap-4"
     >
       <div className="self-stretch flex flex-col justify-start items-start gap-2">
-        <div className="self-stretch inline-flex justify-start items-center gap-2">
+        <div className="self-stretch flex justify-between items-center gap-2">
           <div className="flex-1 justify-start text-[#FCD535] lg:text-base text-xs font-semibold font-Inter leading-normal">
             {elipsKey(markets[index].feedName)}
-          </div>
-          <div className="flex justify-start items-center gap-1">
-            <div className="w-5 h-5 relative overflow-hidden">
-              <Icon name="Message" />
-            </div>
-            <div className="justify-start text-[#9EA5B5] text-sm font-semibold font-interSemi leading-tight">
-              {markets[index].comments ?? 0}
-            </div>
           </div>
           <div className="lg:w-5 lg:h-5 w-4 h-4 relative overflow-hidden">
             <FaRegStar className="text-white" />
           </div>
         </div>
-        <div className="self-stretch inline-flex justify-start items-start gap-4">
-          <div className="flex-1 h-overflow-auto justify-start text-white lg:text-2xl text-lg font-medium font-rubik">
+        <div className="self-stretch flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div className="flex-1 text-white lg:text-2xl text-lg font-medium font-rubik">
             {markets[index].question}
           </div>
-          <img className="lg:w-14 lg:h-14 w-12 h-12 rounded-lg" src={markets[index].imageUrl} alt={markets[index].feedName} />
+          <div className="flex-shrink-0">
+            <img
+              className="lg:w-14 lg:h-14 w-12 h-12 rounded-lg object-cover"
+              src={markets[index].imageUrl}
+              alt={markets[index].feedName}
+            />
+          </div>
         </div>
         
         {/* Market Stats */}
-        <div className="self-stretch grid grid-cols-2 gap-4">
+        <div className="self-stretch grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1">
             <div className="text-[#9EA5B5] text-sm font-semibold">Volume</div>
             <div className="text-white text-sm font-semibold">{markets[index].totalInvestment} BNB</div>
@@ -150,11 +148,11 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
       </div>
 
       {/* Yes/No Buttons */}
-      <div className="self-stretch inline-flex justify-start items-center gap-3">
+      <div className="self-stretch flex flex-col sm:flex-row justify-start items-stretch gap-3">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex-1 px-4 py-2.5 bg-[#223a25] outline outline-[#FCD535] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
+          className="w-full sm:flex-1 px-4 py-2.5 bg-[#223a25] outline outline-[#FCD535] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
           onClick={() => onVote(true)}
         >
           <span className="w-5 h-5 flex items-center justify-center">
@@ -165,7 +163,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex-1 px-4 py-2.5 bg-[#3a2222] outline outline-[#ff6464] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
+          className="w-full sm:flex-1 px-4 py-2.5 bg-[#3a2222] outline outline-[#ff6464] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
           onClick={() => onVote(false)}
         >
           <span className="w-5 h-5 flex items-center justify-center">

@@ -21,8 +21,8 @@ const SearchInputItem: React.FC<SearchInputProps> = ({
       <div className="self-stretch justify-start text-[#9EA5B5] text-xs font-normal font-satoshi leading-3">
         {title}
       </div>
-      <div className="self-stretch inline-flex justify-start items-center gap-1">
-        <div className="w-[120px] px-3 py-2 bg-[#0b0e11] rounded-lg border border-[#1f242c] flex justify-start items-center">
+      <div className="self-stretch flex flex-wrap justify-start items-center gap-2">
+        <div className="min-w-[120px] flex-1 px-3 py-2 bg-[#0b0e11] rounded-lg border border-[#1f242c] flex justify-start items-center">
           <input
             type="number"
             placeholder={minPlaceholder}
@@ -31,7 +31,7 @@ const SearchInputItem: React.FC<SearchInputProps> = ({
             className="flex-1 bg-transparent text-[#9EA5B5] text-xs font-normal font-satoshi leading-3 outline-none"
           />
         </div>
-        <div className="w-[120px] px-3 py-2 bg-[#0b0e11] rounded-lg border border-[#1f242c] flex justify-start items-center">
+        <div className="min-w-[120px] flex-1 px-3 py-2 bg-[#0b0e11] rounded-lg border border-[#1f242c] flex justify-start items-center">
           <input
             type="number"
             placeholder={maxPlaceholder}

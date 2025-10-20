@@ -18,7 +18,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   avatarUrl,
 }) => {
   return (
-    <div className="self-stretch p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex justify-start items-start gap-4">
+    <div className="self-stretch w-full p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex justify-start items-start gap-4">
       {/* Avatar */}
       <img
         className="w-8 h-8 rounded-[10px] border border-white"
@@ -27,8 +27,8 @@ const CommentItem: React.FC<CommentItemProps> = ({
       />
 
       {/* Comment Content */}
-      <div className="flex-1 inline-flex flex-col justify-start items-start gap-1">
-        <div className="inline-flex justify-start items-center gap-1">
+      <div className="flex-1 flex flex-col justify-start items-start gap-1">
+        <div className="flex flex-wrap justify-start items-center gap-1">
           <div className="justify-start text-[#FCD535] text-lg font-medium font-satoshi leading-loose">
             {username}
           </div>

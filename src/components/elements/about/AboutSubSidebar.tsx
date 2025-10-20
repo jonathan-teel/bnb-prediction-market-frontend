@@ -12,7 +12,7 @@ const SidebarItem: React.FC<{ title: string; isActive: boolean; onClick: () => v
       isActive
         ? "border-[#FCD535] bg-[#1e2329] text-[#FCD535] font-bold"
         : "border-transparent text-[#9EA5B5] hover:border-[#FCD535] hover:text-[#FCD535]"
-    } inline-flex justify-start items-center`}
+    } flex justify-start items-center`}
   >
     <div className="flex-1 justify-start text-base font-normal font-['Rubik'] leading-normal">
       {title}

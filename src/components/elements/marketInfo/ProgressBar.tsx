@@ -12,9 +12,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ yesPercentage }) => {
   const noBlocks = 50 - yesBlocks; // Remaining blocks for "No"
 
   return (
-    <div className="self-stretch flex-1 p-2.5 bg-[#0b0e11] rounded-xl border border-[#1f242c] inline-flex justify-start items-center gap-1">
+    <div className="self-stretch flex-1 w-full p-2.5 bg-[#0b0e11] rounded-xl border border-[#1f242c] flex justify-start items-center gap-1">
       {/* Yes Percentage */}
-      <div className="w-8 justify-start text-[#FCD535] text-sm font-semibold font-interSemi leading-tight animate-pulse">
+      <div className="min-w-[32px] text-left text-[#FCD535] text-xs sm:text-sm font-semibold font-interSemi leading-tight animate-pulse">
         {yesPercentage}%
       </div>
 
@@ -40,7 +40,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ yesPercentage }) => {
       </div>
 
       {/* No Percentage */}
-      <div className="w-8 text-right justify-start text-[#ff6464] text-sm font-semibold font-interSemi leading-tight animate-pulse">
+      <div className="min-w-[32px] text-right text-[#ff6464] text-xs sm:text-sm font-semibold font-interSemi leading-tight animate-pulse">
         {noPercentage}%
       </div>
     </div>

@@ -31,8 +31,8 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="self-stretch inline-flex justify-center items-center gap-4">
-      <div className="rounded-[18px] flex justify-start items-center sm:gap-6 gap-3">
+    <div className="self-stretch flex w-full justify-center items-center gap-4">
+      <div className="rounded-[18px] flex flex-wrap justify-center items-center sm:gap-6 gap-3">
         {/* Left Decoration */}
         <div className="sm:p-4 p-2 bg-[#181a20] rounded-2xl border border-[#1f242c] flex justify-center items-center shadow-[0_18px_34px_-28px_rgba(6,12,18,0.65)]">
           <div className="w-6 h-6 flex justify-center items-center">
@@ -41,7 +41,7 @@ const Pagination: React.FC<PaginationProps> = ({
         </div>
 
         {/* Pagination Items */}
-        <div className="flex justify-start items-center gap-2">
+        <div className="flex flex-wrap justify-center items-center gap-2">
           {pageNumbers.map((page) => (
             <div
               key={page}

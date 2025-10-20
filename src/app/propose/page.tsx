@@ -378,8 +378,8 @@ export default function Propose() {
     setActive(true);
   }
   return (
-    <div className="px-[50px] flex-col 2xl:flex-row self-stretch inline-flex justify-start items-start gap-[50px] overflow-auto relative">
-      <div className="flex-1 p-8 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex flex-col justify-center items-center gap-8 relative">
+    <div className="w-full flex flex-col self-stretch justify-start items-start gap-10 px-4 sm:px-8 lg:px-12 2xl:flex-row 2xl:gap-[50px] relative">
+      <div className="flex-1 w-full p-6 sm:p-8 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex flex-col justify-center items-center gap-8 relative">
         {active ? "" : <div className="absolute flex justify-center items-center w-full h-full bg-[#1a1f26]/50 backdrop-blur-sm z-20 rounded-2xl">
           <ClipLoader
             color="#ffffff"

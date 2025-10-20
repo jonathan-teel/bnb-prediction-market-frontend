@@ -23,11 +23,11 @@ const BnbCounter = ({ setAmount, amount }: BnbCounterProps) => {
     }
   }
   return (
-    <div className="self-stretch p-2 bg-[#0b0e11] rounded-xl shadow-[inset_0px_2px_0px_0px_rgba(0,0,0,0.20)] border border-[#1f242c] inline-flex justify-start items-center gap-3">
+    <div className="self-stretch w-full p-2 bg-[#0b0e11] rounded-xl shadow-[inset_0px_2px_0px_0px_rgba(0,0,0,0.20)] border border-[#1f242c] flex justify-start items-center gap-3">
       {/* Decrease Button */}
       <div
         onClick={amount > 0 ? decreaseBnb : undefined}
-        className={` self-stretch p-3 bg-[#1a1f26] rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition-all duration-300 
+        className={`self-stretch p-3 bg-[#1a1f26] rounded-xl flex justify-center items-center gap-1.5 cursor-pointer transition-all duration-300 
           ${amount > 0 ? "hover:bg-[#242a31] active:scale-95" : "opacity-50 cursor-not-allowed"}`}
       >
         <FaMinus className="text-white" />
@@ -35,7 +35,14 @@ const BnbCounter = ({ setAmount, amount }: BnbCounterProps) => {
 
       {/* BNB Amount Display */}
       <div className="flex-1 rounded-lg flex justify-center items-center gap-2">
-        <input type="number" className="justify-start text-[#9EA5B5] text-xl text-center font-medium font-satoshi leading-tight outline-none" value={amount} onChange={changeBalance} />
+        <input
+          type="number"
+          className="w-full max-w-[160px] text-[#9EA5B5] text-xl text-center font-medium font-satoshi leading-tight outline-none bg-transparent"
+          value={amount}
+          onChange={changeBalance}
+          min={0}
+          inputMode="decimal"
+        />
       </div>
 
       {/* Increase Button */}

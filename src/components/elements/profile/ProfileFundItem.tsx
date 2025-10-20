@@ -40,31 +40,30 @@ const ProfileFundItem = (param: any) => {
     setBetAmount(userFund.amount);
     setPercentage((userFund.amount / totalAmount) * 100);
   }, [address, param.investors]);
+  const statusClass = statusColors[param.marketStatus] ?? "bg-[#9EA5B5]/10 text-[#9EA5B5]";
+
   return (
-    <div className="self-stretch p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] inline-flex justify-start items-center gap-3">
-      <img className="w-8 h-8 rounded-lg" src={param.imageUrl} alt="market-icon" />
-      <div className="flex-1 justify-center text-white text-sm font-medium font-satoshi leading-relaxed">
-        {param.question}
+    <div className="self-stretch w-full p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex w-full items-start gap-3 sm:flex-1">
+        <img className="w-10 h-10 rounded-lg object-cover" src={param.imageUrl} alt="market-icon" />
+        <div className="flex-1 text-white text-sm font-medium font-satoshi leading-relaxed">
+          {param.question}
+        </div>
       </div>
-      <div className="w-[100px] rounded-[100px] inline-flex flex-col justify-center items-start">
-        <div
-          className={`px-2.5 ${statusColors[param.marketStatus]} rounded-[100px] inline-flex justify-center items-center gap-2.5`}
-        >
-          <div className="justify-start text-sm font-medium font-satoshi leading-normal">
-            {param.marketStatus}
+      <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto sm:justify-end">
+        <div className="rounded-[100px]">
+          <div className={`px-3 py-1.5 ${statusClass} rounded-[100px] flex items-center justify-center gap-2`}>
+            <div className="text-sm font-medium font-satoshi leading-normal">
+              {param.marketStatus}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="w-[120px] flex justify-start items-center gap-1">
-        {/* <div className="justify-start text-[#9EA5B5] text-sm font-medium font-satoshi leading-relaxed">
-          {betAmount} BNB /
-        </div> */}
-        <div className="w-[50px] justify-start text-[#FCD535] text-sm font-medium font-satoshi leading-relaxed">
+        <div className="flex items-center gap-1 text-[#FCD535] text-sm font-medium font-satoshi leading-relaxed">
           {percentage.toFixed(1)}%
         </div>
-      </div>
-      <div className="w-[100px] justify-start text-white text-sm font-medium font-interSemi leading-relaxed">
-        {betAmount} BNB
+        <div className="text-white text-sm font-medium font-interSemi leading-relaxed">
+          {betAmount} BNB
+        </div>
       </div>
     </div>
   );

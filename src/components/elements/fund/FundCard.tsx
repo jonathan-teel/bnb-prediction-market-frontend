@@ -25,16 +25,16 @@ const FundCard: React.FC<FundInfoProps> = ({
   expiresIn,
 }) => {
   return (
-    <div className="sm:p-6 p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex-col lg:flex-row inline-flex justify-start items-start gap-8 shadow-[0_24px_48px_-36px_rgba(6,12,20,0.65)]">
+    <div className="sm:p-6 p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex w-full flex-col lg:flex-row justify-start items-start gap-8 shadow-[0_24px_48px_-36px_rgba(6,12,20,0.65)]">
       <img
         className="xl:w-[327px] w-[150px] h-[150px] xl:h-[327px] rounded-2xl hidden lg:flex"
         src={imageUrl}
         alt="Fund Image"
       />
-      <div className="flex-1 self-stretch inline-flex flex-col justify-start items-start gap-6">
-        <div className="self-stretch inline-flex justify-start items-start gap-2 relative">
-          <div className="flex-1 inline-flex flex-col justify-start items-start gap-2">
-            <div className="inline-flex justify-start items-center gap-2">
+      <div className="flex-1 self-stretch flex flex-col justify-start items-start gap-6 w-full">
+        <div className="self-stretch flex justify-start items-start gap-2 relative">
+          <div className="flex-1 flex flex-col justify-start items-start gap-2">
+            <div className="flex justify-start items-center gap-2">
               <div className="justify-start text-[#FCD535] text-base font-semibold font-interSemi leading-normal">
                 {category}
               </div>
@@ -74,8 +74,8 @@ const FundCard: React.FC<FundInfoProps> = ({
               </span>
             </div>
           </div>
-          <div className="self-stretch inline-flex justify-between items-center">
-            <div className="flex justify-center cursor-pointer items-end gap-2">
+          <div className="self-stretch flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex justify-center cursor-pointer items-center gap-2">
               <div className="justify-start text-[#FCD535] text-base font-medium font-satoshi leading-relaxed">
                 Read more
               </div>
@@ -83,19 +83,19 @@ const FundCard: React.FC<FundInfoProps> = ({
                 <GoArrowDownRight size={16} className="text-[#FCD535]" />
               </div>
             </div>
-            <div className="text-center justify-start text-[#9EA5B5] text-sm font-medium font-satoshi">
+            <div className="text-left sm:text-center justify-start text-[#9EA5B5] text-sm font-medium font-satoshi">
               Note: This event is legally protected
             </div>
           </div>
         </div>
       </div>
-      <div className="p-6 lg:w-auto w-full bg-[#0b0e11] rounded-2xl border border-[#1f242c] inline-flex flex-col justify-start items-center gap-6">
+      <div className="p-6 lg:w-auto w-full bg-[#0b0e11] rounded-2xl border border-[#1f242c] flex flex-col justify-start items-center gap-6">
         <div className="self-stretch flex flex-col justify-start items-start gap-4">
           <div className="self-stretch justify-start text-white text-2xl font-bold font-satoshi capitalize leading-loose">
             Start funding on this
           </div>
           <div className="self-stretch p-4 bg-[#1a1f26] rounded-2xl border border-[#1f242c] flex flex-col justify-start items-start gap-4">
-            <div className="self-stretch h-[23px] inline-flex justify-between items-center">
+            <div className="self-stretch h-[23px] flex justify-between items-center">
               {/* Progress bar */}
               {[...Array(16)].map((_, index) => (
                 <div
@@ -106,7 +106,7 @@ const FundCard: React.FC<FundInfoProps> = ({
                 />
               ))}
             </div>
-            <div className="self-stretch rounded-xl inline-flex justify-between items-center">
+            <div className="self-stretch rounded-xl flex justify-between items-center gap-4 flex-wrap sm:flex-nowrap">
               <div className="justify-start">
                 <span className="text-[#FCD535] text-lg font-semibold font-interSemi leading-relaxed">
                   {progress}
@@ -120,8 +120,8 @@ const FundCard: React.FC<FundInfoProps> = ({
               </div>
             </div>
           </div>
-          <div className="self-stretch rounded-xl inline-flex justify-between items-center gap-4">
-            <div className="text-right justify-start text-white text-base font-normal font-interSemi leading-relaxed">
+          <div className="self-stretch rounded-xl flex justify-between items-center gap-4 flex-wrap sm:flex-nowrap">
+            <div className="text-left sm:text-right justify-start text-white text-base font-normal font-interSemi leading-relaxed">
               Expires in
             </div>
             <div className="px-3 py-2 bg-[#FCD535]/10 rounded-xl flex justify-start items-center gap-2">
@@ -139,7 +139,7 @@ const FundCard: React.FC<FundInfoProps> = ({
           data-type="Prime"
           className="self-stretch cursor-pointer px-6 py-3.5 bg-[#FCD535] rounded-2xl 
   shadow-[inset_0px_3px_0px_0px_rgba(255,255,255,0.16)] 
-  inline-flex justify-center items-center gap-2 transition-all duration-300 ease-in-out 
+  flex justify-center items-center gap-2 transition-all duration-300 ease-in-out 
   hover:bg-[#C99405] hover:scale-102 hover:shadow-lg active:scale-100"
         >
           <div

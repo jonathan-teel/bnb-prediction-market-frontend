@@ -15,7 +15,7 @@ const ProfileNavbar: React.FC<ProfileNavbarProps> = ({ activeTab, onTabChange })
   ];
 
   return (
-    <div className="h-11 rounded-[18px] inline-flex justify-start items-center gap-2">
+    <div className="w-full rounded-[18px] flex flex-wrap justify-start items-center gap-2">
       {tabs.map((tab) => (
         <div
           key={tab}

@@ -80,19 +80,19 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
   const totalPages = Math.max(1, Math.ceil(total / 10));
 
   return (
-    <div className="flex-1 inline-flex flex-col self-stretch justify-start items-start gap-6">
+    <div className="flex-1 flex w-full flex-col self-stretch justify-start items-start gap-6">
       <Navbar 
         categories={categories} 
         onCategorySelect={handleCategorySelect} 
         showRecentActivity={showRecentActivity}
         onToggleRecentActivity={onToggleRecentActivity}
       />
-      <div className={`grid w-full gap-4 ${
+      <div className={`grid w-full grid-cols-1 gap-4 ${
         pathname === "/fund" 
-          ? "2xl:grid-cols-3 xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1" 
+          ? "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3" 
           : showRecentActivity
-            ? "2xl:grid-cols-2 xl:grid-cols-2 lg:grid-cols-2 sm:grid-cols-1"
-            : "2xl:grid-cols-3 xl:grid-cols-3 lg:grid-cols-2 sm:grid-cols-1"
+            ? "md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2"
+            : "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3"
       }`}>
         {filteredMarkets.map((prediction, index) =>
           activeTab === "ACTIVE" ? (

@@ -66,13 +66,15 @@ const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   return (
-    <nav className="w-full flex justify-between items-center py-4 px-6 rounded-2xl border border-[#1f242c] bg-[#11161c]/85 backdrop-blur-md shadow-[0_20px_44px_-34px_rgba(8,12,18,0.75)] relative">
-      <div className="flex items-center lg:gap-6 gap-3">
+    <nav className="w-full flex flex-col gap-4 md:flex-row md:items-center md:justify-between py-4 px-4 sm:px-6 rounded-2xl border border-[#1f242c] bg-[#11161c]/85 backdrop-blur-md shadow-[0_20px_44px_-34px_rgba(8,12,18,0.75)] relative">
+      <div className="flex flex-wrap items-center lg:gap-6 gap-2">
         {categories.map((category, index) => (
           <div
             key={index}
             onClick={() => handleCategorySelect(category.name)}
-            className={`sm:px-5 px-3 pb-3 inline-flex cursor-pointer justify-start items-center gap-2 transition-all duration-300 ease-in-out relative group uppercase tracking-[0.14em] text-xs sm:text-sm ${activeCategory === category.name ? "text-[#FCD535]" : "text-[#9EA5B5] hover:text-white"}`}
+            className={`sm:px-5 px-3 pb-3 flex cursor-pointer justify-start items-center gap-2 transition-all duration-300 ease-in-out relative group uppercase tracking-[0.14em] text-xs sm:text-sm ${
+              activeCategory === category.name ? "text-[#FCD535]" : "text-[#9EA5B5] hover:text-white"
+            }`}
           >
             <div className={`absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-[#fcd535] via-[#f1c240] to-transparent transition-all duration-300 ease-in-out ${activeCategory === category.name ? "w-full" : "w-0 group-hover:w-full"}`} />
 
@@ -90,7 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({
         ))}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
 
         <div
           data-active={showFilter ? "On" : "Off"}
@@ -120,7 +122,7 @@ const Navbar: React.FC<NavbarProps> = ({
       {showFilter && (
         <div
           ref={searchPadRef}
-          className="z-50 p-5 right-[0px] top-[70px] absolute bg-[#11161c] border border-[#1f242c] rounded-[20px] shadow-[0_20px_60px_-28px_rgba(5,8,17,0.9)] inline-flex flex-col justify-start items-center gap-4"
+          className="z-50 p-5 right-0 top-[70px] absolute bg-[#11161c] border border-[#1f242c] rounded-[20px] shadow-[0_20px_60px_-28px_rgba(5,8,17,0.9)] flex flex-col justify-start items-center gap-4 max-w-[calc(100vw-2rem)]"
         >
           {searchInputs.map((input, index) => (
             <SearchInputItem
@@ -130,7 +132,7 @@ const Navbar: React.FC<NavbarProps> = ({
               maxPlaceholder={input.maxPlaceholder}
             />
           ))}
-          <div className="self-stretch inline-flex justify-start items-start gap-2">
+          <div className="self-stretch flex justify-start items-start gap-2">
             <div
               className="flex-1 px-4 cursor-pointer py-2.5 rounded-[100px] border border-[#2a313a] flex justify-center items-center gap-1 transition-all duration-300 hover:bg-[#15191f] hover:border-[#fcd535]/40 hover:text-white active:scale-95"
             >
