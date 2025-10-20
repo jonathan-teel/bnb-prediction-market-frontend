@@ -9,43 +9,50 @@ const aboutAnswers = [
   {
     title: "What is BnbPredectionMaket?",
     content: [
-      "BnbPredectionMaket is a decentralized prediction market platform where users can forecast outcomes on real-world events—such as sports, crypto, politics, and more—and earn rewards for accurate predictions. It leverages blockchain technology for transparency, security, and community-driven markets.",
-      "Unlike traditional betting or centralized prediction sites, BnbPredectionMaket empowers its community to create, participate in, and resolve markets. This means anyone can propose a new event, and the wisdom of the crowd determines the odds and outcomes. Our platform is designed to be accessible, intuitive, and open to everyone, regardless of experience level.",
+      "BnbPredectionMaket is a decentralized prediction market where you can forecast real-world events such as sports, crypto, politics, and more while earning rewards for accurate calls. Blockchain keeps the experience transparent, secure, and community driven.",
+      "Unlike traditional betting or centralized prediction sites, BnbPredectionMaket lets the community create, join, and resolve markets. Anyone can propose an event and the crowd shapes the odds and outcomes. The interface stays welcoming whether you are new or experienced.",
     ],
   },
   {
     title: "How do prediction markets work?",
     content: [
-      "Prediction markets allow users to buy and sell shares in the outcome of future events. If your prediction is correct, you earn a payout. Prices reflect the collective wisdom of the market, and all trades are recorded on-chain for transparency and fairness.",
-      "On BnbPredectionMaket, each market has a YES and NO side. As users buy shares, the price adjusts to reflect the perceived probability of each outcome. This dynamic pricing means the market odds are always up-to-date, and you can buy or sell your position at any time before the event resolves. All settlements are handled automatically by smart contracts.",
+      "Prediction markets let people buy and sell shares tied to future outcomes. If your call is correct, you earn a payout. Prices reflect the crowd’s view, and every trade is recorded on-chain for transparency and fairness.",
+      "On BnbPredectionMaket each market offers YES and NO positions. As traders buy shares the price shifts to reflect perceived probability. You can adjust or exit before settlement, and smart contracts handle the eventual payouts automatically.",
     ],
   },
   {
     title: "Is BnbPredectionMaket safe and secure?",
     content: [
-      "Yes. BnbPredectionMaket uses blockchain and smart contracts to ensure all trades are transparent, tamper-proof, and automated. User funds are protected by decentralized protocols, and all market outcomes are resolved fairly and openly.",
-      "We never take custody of your funds—everything is managed by secure, audited smart contracts. Our code is open source, and all transactions are visible on the blockchain. We also have robust dispute resolution and community governance to ensure markets are fair and trustworthy.",
+      "Yes. BnbPredectionMaket relies on blockchain and smart contracts so trades remain transparent, tamper resistant, and automated. Funds stay in decentralized protocols and market outcomes resolve in the open.",
+      "We never take custody of your assets; everything is managed by secure smart contracts. Transactions are visible on-chain and backed by community governance and dispute processes that keep markets fair.",
     ],
   },
   {
     title: "How do I participate?",
     content: [
-      "To participate, simply sign up, connect your wallet, and explore available markets. You can buy shares in outcomes you believe will happen, create your own markets, and track your performance—all from an intuitive dashboard.",
-      "Getting started is easy: just connect a supported crypto wallet, deposit funds, and browse the list of active markets. You can filter by category, popularity, or closing time. If you have an idea for a new market, you can propose it and invite others to trade on it. Our help center and community forums are always available if you need assistance.",
+      "To participate, connect your wallet and explore the available markets. Buy shares in outcomes you believe in, create markets of your own, and track your performance from an intuitive dashboard.",
+      "Getting started is simple: connect a supported wallet, load it with funds, and browse active markets by category or closing time. If inspiration strikes, submit a new market and invite others to join. Help resources and community support are always nearby.",
+    ],
+  },
+  {
+    title: "What does funding a market do?",
+    content: [
+      "Funding supplies the liquidity pool that traders use. When you add BNB to a market the funds stay on-chain and back the YES and NO shares so other users can trade immediately. The first successful funding transaction moves a market from pending to active on the home page.",
+      "Funders receive liquidity shares and a cut of trading fees. You can contribute a small or large amount, adjust your position before the event closes, or stay through settlement to collect fees. Funding lets you help launch markets while earning along the way.",
     ],
   },
   {
     title: "What can I predict on BnbPredectionMaket?",
     content: [
-      "You can predict on a wide range of topics, including sports results, cryptocurrency prices, political events, entertainment, and more. New markets are added regularly, and you can even propose your own event for the community to trade on.",
-      "Our platform is constantly evolving, with trending and custom markets created by users like you. Whether you want to forecast the outcome of a major election, the next big crypto move, or the winner of a global sports event, BnbPredectionMaket has a market for you. We encourage creativity and diversity in market creation.",
+      "You can predict outcomes across sports, cryptocurrency prices, politics, entertainment, and more. New markets appear regularly and you are free to propose your own ideas.",
+      "The platform grows with community creativity. Whether you are tracking elections, a new token, or a championship game, there is space to create or join a market. Fresh concepts are always welcome.",
     ],
   },
   {
     title: "How does BnbPredectionMaket make money?",
     content: [
-      "BnbPredectionMaket charges a small fee on trades and market settlements. This fee helps maintain the platform, incentivize liquidity, and fund ongoing development. All fees are transparently displayed and kept as low as possible for users.",
-      "We believe in transparency and fairness. Our fee structure is simple and competitive, with no hidden costs. A portion of the fees is reinvested into platform improvements, community rewards, and security audits to ensure the best possible experience for all users.",
+      "BnbPredectionMaket charges a modest fee on trades and market settlements. The revenue supports platform operations, liquidity incentives, and ongoing development. Fees are clearly displayed and kept low for users.",
+      "We value transparency. The fee structure is straightforward with no hidden costs, and part of the revenue returns to the community through product upgrades, rewards, and security enhancements.",
     ],
   },
 ];
