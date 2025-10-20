@@ -15,8 +15,8 @@ export const PREDICTION_MARKET_ADDRESS =
 
 export const PREDICTION_MARKET_ABI = [
   "function creationFee() view returns (uint256)",
-  "function provideLiquidity(uint256 marketId) payable",
-  "function placeBet(uint256 marketId, bool isYes) payable",
+  "function provideLiquidity(uint256 marketId) payable returns (uint256)",
+  "function placeBet(uint256 marketId, bool isYes) payable returns (uint256)",
   "function withdrawLiquidity(uint256 marketId, uint256 amount)",
   "function claimWinnings(uint256 marketId)",
   "function claimLiquidityFees(uint256 marketId)",

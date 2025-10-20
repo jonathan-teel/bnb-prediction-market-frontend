@@ -45,6 +45,18 @@ export const marketField = [
         market_keyword: (...args: string[]) => `id: ${args[0]}, vs_currency: usd`,
       },
       {
+        api_name: "CoinMarketCap",
+        needed_data: [
+          {
+            name: "feedName",
+            placeholder: "BNB"
+          }
+        ],
+        task: (_index: number, rang: number) => (rang ? "market_cap" : "price"),
+        api_link: (...args: any[]) => `${API_BASE_URL}/feed/coinmarketcap?symbol=${args[0]}`,
+        market_keyword: (...args: string[]) => `symbol: ${args[0]}`,
+      },
+      {
         api_name: "Dexscreener",
         needed_data: [
           {

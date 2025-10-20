@@ -1,6 +1,6 @@
 "use client";
 
-import { BrowserProvider, Contract, parseEther } from "ethers";
+import { BrowserProvider, Contract, Signer, parseEther } from "ethers";
 
 import {
   WalletType,
@@ -63,8 +63,26 @@ const ensureWalletConnection = async (
   return { provider, address, chainId };
 };
 
-const getContract = (provider: BrowserProvider) =>
-  new Contract(PREDICTION_MARKET_ADDRESS, PREDICTION_MARKET_ABI, provider);
+type PredictionMarketContract = Contract & {
+  provideLiquidity: (
+    marketId: bigint,
+    overrides?: { value: bigint }
+  ) => Promise<{ hash: string; wait: () => Promise<unknown> } | any>;
+  placeBet: (
+    marketId: bigint,
+    isYes: boolean,
+    overrides?: { value: bigint }
+  ) => Promise<{ hash: string; wait: () => Promise<unknown> } | any>;
+};
+
+const getContract = (
+  providerOrSigner: BrowserProvider | Signer
+): PredictionMarketContract =>
+  new Contract(
+    PREDICTION_MARKET_ADDRESS,
+    PREDICTION_MARKET_ABI,
+    providerOrSigner
+  ) as unknown as PredictionMarketContract;
 
 const assertTargetNetwork = (chainId: string) => {
   if (chainId.toLowerCase() !== TARGET_CHAIN_ID) {
@@ -92,7 +110,7 @@ export const depositLiquidity = async ({
   const { provider, address, chainId } = await ensureWalletConnection(preferredWallet);
   assertTargetNetwork(chainId);
   const signer = await provider.getSigner();
-  const contract = getContract(provider).connect(signer);
+  const contract = getContract(signer);
 
   const normalizedAmount = parseEther(amount.toString());
   const normalizedMarketId = normalizeMarketId(marketId);
@@ -124,7 +142,7 @@ export const marketBetting = async ({
   const { provider, address, chainId } = await ensureWalletConnection(preferredWallet);
   assertTargetNetwork(chainId);
   const signer = await provider.getSigner();
-  const contract = getContract(provider).connect(signer);
+  const contract = getContract(signer);
 
   const normalizedMarketId = normalizeMarketId(marketId);
   const stake = parseEther(amount.toString());

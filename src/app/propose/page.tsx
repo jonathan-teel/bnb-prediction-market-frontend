@@ -200,10 +200,14 @@ export default function Propose() {
   const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     e.preventDefault();
     const { name, value } = e.target as HTMLInputElement;
-    
+    const currentSource = marketField[marketFieldIndex].content[marketFieldContentIndex].api_name;
+    const normalizedValue = currentSource === "CoinMarketCap" && name === "feedName"
+      ? value.toUpperCase()
+      : value;
+
     setData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: normalizedValue,
     }));
 
     setError((prevError) => ({
@@ -291,7 +295,7 @@ export default function Propose() {
           setActive(true);
           return
         }
-        if (marketField[marketFieldIndex].name === "Coingecho") {
+        if (market_detail.api_name === "Coingecho") {
           if (!selectedToken) {
             errorAlert("Invalid Token Ticker!");
             return
@@ -313,7 +317,11 @@ export default function Propose() {
         : findJsonPathsForKey(JSON.stringify(response.data), data.range ? "market_cap" : "usd")[0];
       console.log("task:", task);
 
-      data.dataLink = api_link;
+      if (market_detail.api_name === "CoinMarketCap") {
+        data.dataLink = (response.data?.symbol ?? data.feedName).toUpperCase();
+      } else {
+        data.dataLink = api_link;
+      }
       data.task = task;
       data.creator = address || "";
       data.marketField = marketFieldIndex;

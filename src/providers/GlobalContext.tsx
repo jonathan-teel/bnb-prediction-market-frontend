@@ -33,12 +33,42 @@ type MarketDataType = {
   "comments": number
 }
 
+const normalizeMarket = (market: Partial<MarketDataType> & Record<string, any>): MarketDataType => ({
+  _id: market._id ?? "",
+  marketField: market.marketField ?? 0,
+  apiType: market.apiType ?? 0,
+  task: market.task ?? "",
+  creator: market.creator ?? "",
+  tokenA: market.tokenA ?? "",
+  tokenB: market.tokenB ?? "",
+  market: market.market ?? "",
+  question: market.question ?? "",
+  feedName: market.feedName ?? "",
+  value: market.value ?? 0,
+  tradingAmountA: market.tradingAmountA ?? 0,
+  tradingAmountB: market.tradingAmountB ?? 0,
+  tokenAPrice: market.tokenAPrice ?? 0,
+  tokenBPrice: market.tokenBPrice ?? 0,
+  initAmount: market.initAmount ?? 0,
+  range: market.range ?? 0,
+  date: market.date ?? "",
+  marketStatus: market.marketStatus ?? "INIT",
+  imageUrl: market.imageUrl ?? "",
+  createdAt: market.createdAt ?? "",
+  __v: market.__v ?? 0,
+  playerACount: market.playerACount ?? 0,
+  playerBCount: market.playerBCount ?? 0,
+  totalInvestment: market.totalInvestment ?? 0,
+  description: market.description ?? "",
+  comments: market.comments ?? 0,
+});
+
 // Define Global Context Type
 interface GlobalContextType {
   activeTab: MarketStatus;
   markets: MarketDataType[];
   setActiveTab: (tab: MarketStatus) => void;
-  formatMarketData: (data: MarketDataType[]) => void;
+  formatMarketData: (data: (Partial<MarketDataType> & Record<string, any>)[]) => void;
 }
 
 // Create Context
@@ -49,8 +79,9 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [activeTab, setActiveTab] = useState<MarketStatus>("ACTIVE");
   const [markets, setMarkets] = useState<MarketDataType[]>([]);
 
-  const formatMarketData = (data: MarketDataType[]) => {
-    setMarkets(data);
+  const formatMarketData = (data: (Partial<MarketDataType> & Record<string, any>)[]) => {
+    const normalized = data.map((market) => normalizeMarket(market));
+    setMarkets(normalized);
   }
 
   return (

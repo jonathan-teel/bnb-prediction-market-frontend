@@ -11,7 +11,7 @@ import { marketField } from "@/data/data";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { getCountDown } from "@/utils";
+import { getCountDown, shortenAddress } from "@/utils";
 import { depositLiquidity } from "@/components/prediction_market_sdk";
 import { errorAlert, infoAlert } from "@/components/elements/ToastGroup";
 import axios from "axios";
