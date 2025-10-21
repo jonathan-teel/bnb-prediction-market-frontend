@@ -10,11 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { io, type Socket } from "socket.io-client";
-import {
-  MarketStatus,
-  MarketDataType,
-  type BetHistoryEntry,
-} from "@/types/type";
+import { MarketDataType, type BetHistoryEntry } from "@/types/type";
 import { API_BASE_URL } from "@/config/api";
 
 const stripTrailingSlashes = (value: string) => value.replace(/\/+$/, "");
@@ -150,7 +146,7 @@ const normaliseMarket = (
     initAmount: coerceNumber(market.initAmount),
     range: coerceNumber(market.range),
     date: coerceDateString(market.date),
-    marketStatus: (market.marketStatus as MarketStatus) ?? "INIT",
+    marketStatus: market.marketStatus ?? "INIT",
     imageUrl: market.imageUrl ?? "",
     createdAt: coerceDateString(market.createdAt),
     updatedAt: coerceDateString((market as any).updatedAt),
@@ -176,9 +172,7 @@ const normaliseMarket = (
 };
 
 interface GlobalContextType {
-  activeTab: MarketStatus;
   markets: MarketDataType[];
-  setActiveTab: (tab: MarketStatus) => void;
   formatMarketData: (
     data: (Partial<MarketDataType> & Record<string, any>)[]
   ) => void;
@@ -187,7 +181,6 @@ interface GlobalContextType {
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
-  const [activeTab, setActiveTab] = useState<MarketStatus>("ACTIVE");
   const [markets, setMarkets] = useState<MarketDataType[]>([]);
   const socketRef = useRef<Socket | null>(null);
 
@@ -243,9 +236,7 @@ export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   }, [upsertMarket]);
 
   return (
-    <GlobalContext.Provider
-      value={{ activeTab, markets, setActiveTab, formatMarketData }}
-    >
+    <GlobalContext.Provider value={{ markets, formatMarketData }}>
       {children}
     </GlobalContext.Provider>
   );

@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { categories } from "@/data/data";
 import Pagination from "../pagination/Pagination";
 import PredictionCard from "./PredictionCard";
-import PendingCard from "./PendingCard";
 import Navbar from "../Navbar";
 import axios, { AxiosResponse } from "axios";
 import { API_BASE_URL } from "@/config/api";
@@ -14,7 +13,7 @@ interface MarketProps {
 }
 
 const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRecentActivity }) => {
-  const { markets, activeTab, formatMarketData } = useGlobalContext();
+  const { markets, formatMarketData } = useGlobalContext();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("Trending");
   const [total, setTotal] = useState(0);
@@ -31,9 +30,8 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
         }
       };
       const fieldQuery = selectedCategory === "Sports" ? 1 : 0;
-      const marketStatus = activeTab === "PENDING" ? "PENDING" : "ACTIVE";
       marketData = await axios.get(
-        `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=${marketStatus}&marketField=${fieldQuery}`
+        `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${fieldQuery}`
       );
 
       if (marketData.data?.total !== undefined) {
@@ -45,7 +43,7 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
         formatMarketData([]);
       }
     })()
-  }, [activeTab, selectedCategory, currentPage])
+  }, [selectedCategory, currentPage])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -80,31 +78,20 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
         showRecentActivity={showRecentActivity}
         onToggleRecentActivity={onToggleRecentActivity}
       />
-      <div className={`grid w-full grid-cols-1 gap-4 ${
-        activeTab === "PENDING"
-          ? "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3"
-          : showRecentActivity
+      <div
+        className={`grid w-full grid-cols-1 gap-4 ${
+          showRecentActivity
             ? "md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2"
             : "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3"
-      }`}>
-        {filteredMarkets.map((prediction) =>
-          activeTab === "ACTIVE" ? (
-            <PredictionCard
-              key={prediction._id}
-              index={markets.indexOf(prediction)}
-              currentPage={currentPage}
-            />
-          ) : (
-            <PendingCard
-              key={prediction._id}
-              category={prediction.feedName}
-              question={prediction.question}
-              imageUrl={prediction.imageUrl}
-              volume={prediction.totalInvestment}
-              timeLeft={prediction.date}
-            />
-          )
-        )}
+        }`}
+      >
+        {filteredMarkets.map((prediction) => (
+          <PredictionCard
+            key={prediction._id}
+            index={markets.indexOf(prediction)}
+            currentPage={currentPage}
+          />
+        ))}
       </div>
 
       {total > 10 && (

@@ -1,25 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 
 import DashboardHero from "@/components/elements/hero/DashboardHero";
 import MarketCarousel from "@/components/elements/carousel/MarketCarousel";
 import Market from "@/components/elements/marketInfo/Market";
 import RecentList from "@/components/elements/marketInfo/RecentList";
-import { useGlobalContext } from "@/providers/GlobalContext";
 
 export default function Home() {
-  const pathname = usePathname();
-  const { setActiveTab } = useGlobalContext();
   const [showRecentActivity, setShowRecentActivity] = useState(true);
-
-  useEffect(() => {
-    if (pathname === "/") {
-      setActiveTab("ACTIVE");
-    }
-  }, [pathname, setActiveTab]);
 
   return (
     <>

@@ -31,14 +31,14 @@ const aboutAnswers = [
     title: "How do I participate?",
     content: [
       "To participate, connect your wallet and explore the available markets. Buy shares in outcomes you believe in, create markets of your own, and track your performance from an intuitive dashboard.",
-      "Getting started is simple: connect MetaMask, Trust Wallet, or any WalletConnect-compatible wallet, load it with funds, and browse active markets by category or closing time. If inspiration strikes, submit a new market and invite others to join. Help resources and community support are always nearby.",
+      "Getting started is simple: connect MetaMask or Trust Wallet, load up on BNB, and browse active markets by category or closing time. If inspiration strikes, submit a new market and invite others to join. Help resources and community support are always nearby.",
     ],
   },
   {
     title: "How do markets go live?",
     content: [
       "Once a market is created and approved it appears in the active list immediately. Traders can begin placing YES or NO positions right away, with odds updating as the crowd participates.",
-      "If a market requires additional details the team may hold it in the pending view temporarily, but no separate funding step is required. Everything moves on-chain the moment the market is published.",
+      "Every approved market appears instantly in the live list. There is no pending queue—once published, traders can take positions immediately and everything settles on-chain.",
     ],
   },
   {

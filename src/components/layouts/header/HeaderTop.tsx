@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import Icon from "@/components/elements/Icons";
-import { useGlobalContext } from "@/providers/GlobalContext";
 import { useWallet } from "@/providers/WalletProvider";
 import { shortenAddress } from "@/utils";
 import type { WalletType } from "@/utils/wallets";
@@ -20,7 +19,6 @@ const NAV_LINKS: { label: string; href: string }[] = [
 ];
 
 const HeaderTop: React.FC = () => {
-  const { activeTab, setActiveTab } = useGlobalContext();
   const pathname = usePathname();
   const {
     connected,
@@ -102,8 +100,6 @@ const HeaderTop: React.FC = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
-
-  const isHome = pathname === "/";
 
   const handleWalletClick = async () => {
     try {
@@ -305,65 +301,6 @@ const HeaderTop: React.FC = () => {
             </div>
           )}
 
-          <div className="hidden lg:flex items-center gap-3 rounded-2xl border border-[#1f242c] bg-[#1a1f26] px-4 py-3">
-            <span className="pointer-events-none">
-              <Icon name="Search" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search markets, creators, feeds"
-              className="flex-1 bg-transparent text-[#9EA5B5] text-base font-medium font-satoshi leading-normal outline-none placeholder:text-[#5f6b7a]"
-            />
-            <div className="px-3 py-1 bg-[#11161c] rounded-lg border border-[#1f242c]">
-              <span className="text-[#9EA5B5] text-xs font-medium font-satoshi uppercase tracking-[0.18em]">
-                Ctrl / Cmd + K
-              </span>
-            </div>
-          </div>
-
-          {isHome && (
-            <div className="flex items-center gap-2 rounded-[18px] border border-[#1f242c] bg-[#11161c] p-1">
-              {(["ACTIVE", "PENDING"] as const).map((tab) => {
-                const isActive = activeTab === tab;
-                return (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2.5 rounded-2xl flex items-center gap-2 transition-all duration-300 ${
-                      isActive
-                        ? "bg-[#181a20] text-white shadow-[inset_0px_2px_0px_0px_rgba(55,55,55,0.45)]"
-                        : "bg-transparent text-[#9EA5B5] hover:bg-[#15191f] hover:shadow-md hover:scale-95"
-                    }`}
-                  >
-                    <Icon
-                      name={tab === "ACTIVE" ? "ActiveMarket" : "PendingMarket"}
-                      color={isActive ? "#FCD535" : "#9EA5B5"}
-                      className="transition-transform duration-300 ease-in-out hover:scale-110"
-                    />
-                    <span className="text-sm font-medium font-satoshi tracking-[0.18em] uppercase">
-                      {tab === "ACTIVE" ? "Active" : "Pending"} Market
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="lg:hidden flex items-center gap-3 rounded-2xl border border-[#1f242c] bg-[#1a1f26] px-4 py-3">
-            <span className="cursor-pointer">
-              <Icon name="Search" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search"
-              className="flex-1 bg-transparent text-[#9EA5B5] text-sm font-medium font-satoshi leading-normal outline-none placeholder:text-[#5f6b7a]"
-            />
-            <div className="px-3 py-1 bg-[#11161c] rounded-lg border border-[#1f242c]">
-              <span className="text-[#9EA5B5] text-xs font-medium font-satoshi uppercase tracking-[0.18em]">
-                Ctrl / Cmd + K
-              </span>
-            </div>
-          </div>
         </div>
       </div>
       {isMobileMenuOpen && (
