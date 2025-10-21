@@ -50,7 +50,7 @@ export const successAlert = (text: string) => {
     });
 };
 
-export const infoAlert = (text: string) => {
+export const infoAlert = (text: string, link?: string) => {
     toast.info(text, {
         position: "top-right",
         autoClose: 2000,
@@ -59,5 +59,11 @@ export const infoAlert = (text: string) => {
         pauseOnHover: true,
         draggable: true,
         theme: "colored",
+        className: link ? "cursor-pointer" : undefined,
+        onClick: () => {
+            if (link) {
+                window.open(link, "_blank", "noopener,noreferrer");
+            }
+        },
     });
 };

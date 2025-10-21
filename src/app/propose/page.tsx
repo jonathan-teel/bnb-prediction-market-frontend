@@ -345,13 +345,8 @@ export default function Propose() {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Error message
         console.error('Message:', error.message);
-
-        // HTTP status code
         console.error('Status:', error.response?.status);
-
-        // Error response data (optional)
         console.error('Error data:', error.response?.data);
 
         if (error.response?.status === 401) {
@@ -365,13 +360,21 @@ export default function Propose() {
             value: error.response?.data.value || "",
             description: error.response?.data.description || "",
           });
+        }
 
-        } else if (error.response?.status === 500) {
-          console.log("Axios Error:", error.response?.data); 
+        const backendMessage =
+          typeof error.response?.data === "string"
+            ? error.response?.data
+            : error.response?.data?.message;
+
+        if (backendMessage) {
+          errorAlert(backendMessage);
+        } else {
+          errorAlert("Market creation failed. Please review your inputs and try again.");
         }
       } else {
         console.error('Unexpected error:', error);
-        infoAlert(JSON.stringify(error));
+        errorAlert('Unexpected error while creating the market.');
       }
     }
 

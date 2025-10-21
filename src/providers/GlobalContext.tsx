@@ -3,6 +3,12 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { MarketStatus } from "@/types/type";
 // Define ActiveTab type
+type BetEntry = {
+  player: string;
+  amount: number;
+  timestamp?: string;
+};
+
 type MarketDataType = {
   "_id": string,
   "marketField": number,
@@ -30,7 +36,10 @@ type MarketDataType = {
   "playerBCount": number,
   "totalInvestment": number,
   "description": string,
-  "comments": number
+  "comments": number,
+  "playerA": BetEntry[],
+  "playerB": BetEntry[],
+  "onChainId": number | null
 }
 
 const normalizeMarket = (market: Partial<MarketDataType> & Record<string, any>): MarketDataType => ({
@@ -61,6 +70,9 @@ const normalizeMarket = (market: Partial<MarketDataType> & Record<string, any>):
   totalInvestment: market.totalInvestment ?? 0,
   description: market.description ?? "",
   comments: market.comments ?? 0,
+  playerA: Array.isArray(market.playerA) ? market.playerA : [],
+  playerB: Array.isArray(market.playerB) ? market.playerB : [],
+  onChainId: typeof market.onChainId === "number" ? market.onChainId : (typeof market.onChainId === "string" ? Number(market.onChainId) : null),
 });
 
 // Define Global Context Type
@@ -99,3 +111,4 @@ export const useGlobalContext = () => {
   }
   return context;
 };
+

@@ -79,6 +79,9 @@ export type MarketDataType = {
   totalInvestment: number;
   description: string;
   comments: number;
+  playerA: BetHistoryEntry[];
+  playerB: BetHistoryEntry[];
+  onChainId: number | null;
 };
 
 export type ReferralType = {
@@ -89,4 +92,10 @@ export type ReferralType = {
   status: "PENDING" | "ACTIVE";
   wallet_refered: string;
   createdAt: string;
+};
+
+export type BetHistoryEntry = {
+  player: string;
+  amount: number;
+  timestamp?: string;
 };

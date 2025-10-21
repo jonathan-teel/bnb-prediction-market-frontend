@@ -2,7 +2,7 @@
 
 import { TARGET_CHAIN_ID } from "@/config/network";
 
-const fallbackAddress = "0x00eB43836997c6365292aaB44a8add565a54798c";
+const fallbackAddress = "0x0f73Eba59234fe9110C50C220e7Da5997749dFb9";
 
 const resolveEnv = (key: string): string | undefined => {
   if (typeof process === "undefined" || !process.env) return undefined;
@@ -17,6 +17,7 @@ export const PREDICTION_MARKET_ABI = [
   "function creationFee() view returns (uint256)",
   "function provideLiquidity(uint256 marketId) payable returns (uint256)",
   "function placeBet(uint256 marketId, bool isYes) payable returns (uint256)",
+  "function withdrawBet(uint256 marketId, bool isYes, uint256 amount)",
   "function withdrawLiquidity(uint256 marketId, uint256 amount)",
   "function claimWinnings(uint256 marketId)",
   "function claimLiquidityFees(uint256 marketId)",
@@ -28,6 +29,7 @@ export const PREDICTION_MARKET_ABI = [
   "event MarketCreated(uint256 indexed marketId, address indexed creator, string question, uint64 closingTime, string metadataURI)",
   "event LiquidityProvided(uint256 indexed marketId, address indexed provider, uint256 amount, uint256 feeCharged)",
   "event BetPlaced(uint256 indexed marketId, address indexed bettor, bool isYes, uint256 stake, uint256 feeCharged)",
+  "event BetWithdrawn(uint256 indexed marketId, address indexed bettor, bool isYes, uint256 amount, uint256 feeCharged)",
   "event MarketResolved(uint256 indexed marketId, uint8 outcome)"
 ] as const;
 

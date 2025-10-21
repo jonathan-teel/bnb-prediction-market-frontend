@@ -1,6 +1,6 @@
 "use client";
 
-import { BrowserProvider, Contract, Signer, parseEther } from "ethers";
+import { BrowserProvider, Contract, Signer, formatEther, parseEther } from "ethers";
 
 import {
   WalletType,
@@ -73,6 +73,15 @@ type PredictionMarketContract = Contract & {
     isYes: boolean,
     overrides?: { value: bigint }
   ) => Promise<{ hash: string; wait: () => Promise<unknown> } | any>;
+  withdrawBet: (
+    marketId: bigint,
+    isYes: boolean,
+    amount: bigint
+  ) => Promise<{ hash: string; wait: () => Promise<unknown> } | any>;
+  getBetPosition: (
+    marketId: bigint,
+    account: string
+  ) => Promise<[bigint, bigint, boolean]>;
 };
 
 const getContract = (
@@ -161,3 +170,51 @@ export const marketBetting = async ({
 };
 
 export const ensureWallet = async () => ensureWalletConnection();
+
+export const marketWithdraw = async ({
+  marketId,
+  outcome,
+  amount,
+  preferredWallet,
+}: {
+  marketId: string | number | bigint;
+  outcome: "YES" | "NO";
+  amount: number;
+  preferredWallet?: WalletType;
+}): Promise<ContractTxResult> => {
+  const { provider, address, chainId } = await ensureWalletConnection(preferredWallet);
+  assertTargetNetwork(chainId);
+  const signer = await provider.getSigner();
+  const contract = getContract(signer);
+
+  const normalizedMarketId = normalizeMarketId(marketId);
+  const withdrawAmount = parseEther(amount.toString());
+
+  const tx = await contract.withdrawBet(normalizedMarketId, outcome === "YES", withdrawAmount);
+  await tx.wait();
+
+  return {
+    hash: tx.hash,
+    address,
+    chainId,
+    explorerUrl: `${TARGET_EXPLORER_BASE}${tx.hash}`,
+  };
+};
+
+export const getUserPosition = async ({
+  marketId,
+  preferredWallet,
+}: {
+  marketId: string | number | bigint;
+  preferredWallet?: WalletType;
+}): Promise<{ yes: number; no: number }> => {
+  const { provider, address, chainId } = await ensureWalletConnection(preferredWallet);
+  assertTargetNetwork(chainId);
+  const contract = getContract(provider);
+  const normalizedMarketId = normalizeMarketId(marketId);
+  const [yesStake, noStake] = await contract.getBetPosition(normalizedMarketId, address);
+  return {
+    yes: Number(formatEther(yesStake)),
+    no: Number(formatEther(noStake)),
+  };
+};
