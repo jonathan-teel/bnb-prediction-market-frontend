@@ -1,51 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 
 import { useGlobalContext } from "@/providers/GlobalContext";
 import { formatTokenAmount } from "@/utils";
 
-interface NetworkStats {
-  price: number | null;
-  change24h: number | null;
-}
-
-const formatCurrency = (value: number | null) => {
-  if (value === null || Number.isNaN(value)) return "-";
-  return `$${value.toFixed(2)}`;
-};
-
 const DashboardHero: React.FC = () => {
   const { markets } = useGlobalContext();
-  const [networkStats, setNetworkStats] = useState<NetworkStats>({ price: null, change24h: null });
-  const [isLoading, setIsLoading] = useState(false);
 
   const totalMarkets = markets.length;
   const totalTreasury = useMemo(() => {
     return markets.reduce((acc, market) => acc + (Number(market.totalInvestment) || 0), 0);
   }, [markets]);
-
-  useEffect(() => {
-    const fetchPrice = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch("https://api.binance.com/api/v3/ticker/24hr?symbol=BNBUSDT");
-        const data = await response.json();
-        const price = parseFloat(data?.lastPrice ?? "0");
-        const change = parseFloat(data?.priceChangePercent ?? "0");
-        setNetworkStats({ price, change24h: change });
-      } catch (error) {
-        console.error("Failed to fetch BNB price", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchPrice();
-    const interval = setInterval(fetchPrice, 60_000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <section className="relative overflow-hidden rounded-[28px] border border-[color:var(--border-soft)] bg-[linear-gradient(140deg,rgba(18,27,44,0.82),rgba(6,10,18,0.94))] px-6 py-10 shadow-bnb-card sm:px-10 lg:px-14">
@@ -66,7 +33,7 @@ const DashboardHero: React.FC = () => {
               <br className="hidden sm:block" /> Fuel markets with BNB in seconds.
             </h1>
             <p className="mt-4 max-w-2xl text-base text-[color:var(--text-muted)] sm:text-lg">
-              Launch new markets, back your convictions, and earn yield in a non-custodial prediction protocol designed for the BNB ecosystem.
+              Launch new markets, back your convictions, and trade in a non-custodial prediction protocol designed for the BNB ecosystem.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
@@ -85,23 +52,7 @@ const DashboardHero: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="relative overflow-hidden rounded-2xl border border-[color:var(--border-soft)] bg-[rgba(13,20,34,0.88)] px-5 py-4 shadow-bnb-card">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(252,213,53,0.14),transparent_68%)] opacity-80" />
-            <span className="text-xs uppercase tracking-[0.32em] text-[color:var(--text-soft)]">BNB Price</span>
-            <div className="mt-2 flex items-baseline gap-2 text-white">
-              <span className="text-2xl font-semibold">
-                {isLoading ? "." : formatCurrency(networkStats.price)}
-              </span>
-              <span
-                className={`text-xs font-medium ${(networkStats.change24h ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}
-              >
-                {networkStats.change24h !== null ? `${networkStats.change24h.toFixed(2)}%` : "-"}
-              </span>
-            </div>
-            <p className="mt-1 text-xs text-[color:var(--text-soft)]">24h change</p>
-          </div>
-
+        <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="relative overflow-hidden rounded-2xl border border-[color:var(--border-soft)] bg-[rgba(13,20,34,0.88)] px-5 py-4 shadow-bnb-card">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(252,213,53,0.1),transparent_70%)] opacity-60" />
             <span className="text-xs uppercase tracking-[0.32em] text-[color:var(--text-soft)]">Total Markets</span>

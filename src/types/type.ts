@@ -54,7 +54,7 @@ export type GlobalSettingType = {
   feePercentage: number;
 };
 
-export type MarketStatus = "INIT" | "PENDING" | "ACTIVE" | "CLOSED";
+export type MarketStatus = "INIT" | "PENDING" | "ACTIVE" | "CLOSED" | "CANCELLED";
 
 export type MarketDataType = {
   _id: string;
@@ -68,6 +68,11 @@ export type MarketDataType = {
   question: string;
   feedName: string;
   value: number;
+  tradingAmountA: number;
+  tradingAmountB: number;
+  tokenAPrice: number;
+  tokenBPrice: number;
+  initAmount: number;
   range: number;
   date: string;
   marketStatus: string;
@@ -82,6 +87,11 @@ export type MarketDataType = {
   playerA: BetHistoryEntry[];
   playerB: BetHistoryEntry[];
   onChainId: number | null;
+  outcome?: "PENDING" | "YES" | "NO" | "CANCELLED";
+  resolutionStatus?: "IDLE" | "PENDING" | "PROCESSING" | "FAILED" | "RESOLVED";
+  resolvedAt?: string;
+  resolutionSource?: string;
+  updatedAt?: string;
 };
 
 export type ReferralType = {

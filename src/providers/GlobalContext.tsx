@@ -1,109 +1,256 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
-import { MarketStatus } from "@/types/type";
-// Define ActiveTab type
-type BetEntry = {
-  player: string;
-  amount: number;
-  timestamp?: string;
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { io, type Socket } from "socket.io-client";
+import {
+  MarketStatus,
+  MarketDataType,
+  type BetHistoryEntry,
+} from "@/types/type";
+import { API_BASE_URL } from "@/config/api";
+
+const stripTrailingSlashes = (value: string) => value.replace(/\/+$/, "");
+
+const deriveSocketUrl = (): string => {
+  const base = stripTrailingSlashes(API_BASE_URL);
+  if (base.endsWith("/api")) {
+    return stripTrailingSlashes(base.slice(0, -4));
+  }
+  return base;
 };
 
-type MarketDataType = {
-  "_id": string,
-  "marketField": number,
-  "apiType": number,
-  "task": string,
-  "creator": string,
-  "tokenA": string,
-  "tokenB": string,
-  "market": string,
-  "question": string,
-  "feedName": string,
-  "value": number,
-  "tradingAmountA": number,
-  "tradingAmountB": number,
-  "tokenAPrice": number,
-  "tokenBPrice": number,
-  "initAmount": number,
-  "range": number,
-  "date": string,
-  "marketStatus": string,
-  "imageUrl": string,
-  "createdAt": string,
-  "__v": number,
-  "playerACount": number,
-  "playerBCount": number,
-  "totalInvestment": number,
-  "description": string,
-  "comments": number,
-  "playerA": BetEntry[],
-  "playerB": BetEntry[],
-  "onChainId": number | null
-}
+const sumAmounts = (entries: any[]): number =>
+  entries.reduce((sum, entry) => {
+    const amount = Number(entry?.amount ?? 0);
+    return Number.isFinite(amount) ? sum + amount : sum;
+  }, 0);
 
-const normalizeMarket = (market: Partial<MarketDataType> & Record<string, any>): MarketDataType => ({
-  _id: market._id ?? "",
-  marketField: market.marketField ?? 0,
-  apiType: market.apiType ?? 0,
-  task: market.task ?? "",
-  creator: market.creator ?? "",
-  tokenA: market.tokenA ?? "",
-  tokenB: market.tokenB ?? "",
-  market: market.market ?? "",
-  question: market.question ?? "",
-  feedName: market.feedName ?? "",
-  value: market.value ?? 0,
-  tradingAmountA: market.tradingAmountA ?? 0,
-  tradingAmountB: market.tradingAmountB ?? 0,
-  tokenAPrice: market.tokenAPrice ?? 0,
-  tokenBPrice: market.tokenBPrice ?? 0,
-  initAmount: market.initAmount ?? 0,
-  range: market.range ?? 0,
-  date: market.date ?? "",
-  marketStatus: market.marketStatus ?? "INIT",
-  imageUrl: market.imageUrl ?? "",
-  createdAt: market.createdAt ?? "",
-  __v: market.__v ?? 0,
-  playerACount: market.playerACount ?? 0,
-  playerBCount: market.playerBCount ?? 0,
-  totalInvestment: market.totalInvestment ?? 0,
-  description: market.description ?? "",
-  comments: market.comments ?? 0,
-  playerA: Array.isArray(market.playerA) ? market.playerA : [],
-  playerB: Array.isArray(market.playerB) ? market.playerB : [],
-  onChainId: typeof market.onChainId === "number" ? market.onChainId : (typeof market.onChainId === "string" ? Number(market.onChainId) : null),
-});
+const coerceNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
 
-// Define Global Context Type
+const coerceDateString = (value: unknown): string => {
+  if (!value) return "";
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return new Date(value).toISOString();
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+    const parsed = Date.parse(trimmed);
+    if (!Number.isNaN(parsed)) {
+      return new Date(parsed).toISOString();
+    }
+    return trimmed;
+  }
+  return "";
+};
+
+const normaliseOutcomeValue = (
+  value: unknown
+): MarketDataType["outcome"] => {
+  if (typeof value !== "string") return undefined;
+  const upper = value.toUpperCase();
+  if (upper === "PENDING" || upper === "YES" || upper === "NO" || upper === "CANCELLED") {
+    return upper as MarketDataType["outcome"];
+  }
+  return undefined;
+};
+
+const normaliseResolutionStatus = (
+  value: unknown
+): MarketDataType["resolutionStatus"] => {
+  if (typeof value !== "string") return undefined;
+  const upper = value.toUpperCase();
+  if (
+    upper === "IDLE" ||
+    upper === "PENDING" ||
+    upper === "PROCESSING" ||
+    upper === "FAILED" ||
+    upper === "RESOLVED"
+  ) {
+    return upper as MarketDataType["resolutionStatus"];
+  }
+  return undefined;
+};
+
+const normaliseMarket = (
+  market: Partial<MarketDataType> & Record<string, any>
+): MarketDataType => {
+  const playerAEntries: BetHistoryEntry[] = Array.isArray(market.playerA)
+    ? (market.playerA as BetHistoryEntry[])
+    : [];
+  const playerBEntries: BetHistoryEntry[] = Array.isArray(market.playerB)
+    ? (market.playerB as BetHistoryEntry[])
+    : [];
+
+  const derivedPlayerACount = sumAmounts(playerAEntries);
+  const derivedPlayerBCount = sumAmounts(playerBEntries);
+
+  const playerACount = coerceNumber(
+    market.playerACount,
+    derivedPlayerACount
+  );
+  const playerBCount = coerceNumber(
+    market.playerBCount,
+    derivedPlayerBCount
+  );
+
+  const totalInvestment = coerceNumber(
+    market.totalInvestment,
+    playerACount + playerBCount
+  );
+
+  let onChainId: number | null = null;
+  if (typeof market.onChainId === "number" && Number.isFinite(market.onChainId)) {
+    onChainId = market.onChainId;
+  } else if (typeof market.onChainId === "string") {
+    const parsed = Number(market.onChainId);
+    onChainId = Number.isFinite(parsed) ? parsed : null;
+  }
+
+  const id =
+    typeof market._id === "string"
+      ? market._id
+      : typeof market._id === "object" && market._id !== null
+      ? (market._id as any).toString?.() ?? ""
+      : "";
+
+  return {
+    _id: id,
+    marketField: coerceNumber(market.marketField),
+    apiType: coerceNumber(market.apiType),
+    task: market.task ?? "",
+    creator: market.creator ?? "",
+    tokenA: market.tokenA ?? "",
+    tokenB: market.tokenB ?? "",
+    market: market.market ?? "",
+    question: market.question ?? "",
+    feedName: market.feedName ?? "",
+    value: coerceNumber(market.value),
+    tradingAmountA: coerceNumber(market.tradingAmountA),
+    tradingAmountB: coerceNumber(market.tradingAmountB),
+    tokenAPrice: coerceNumber(market.tokenAPrice),
+    tokenBPrice: coerceNumber(market.tokenBPrice),
+    initAmount: coerceNumber(market.initAmount),
+    range: coerceNumber(market.range),
+    date: coerceDateString(market.date),
+    marketStatus: (market.marketStatus as MarketStatus) ?? "INIT",
+    imageUrl: market.imageUrl ?? "",
+    createdAt: coerceDateString(market.createdAt),
+    updatedAt: coerceDateString((market as any).updatedAt),
+    __v: coerceNumber(market.__v),
+    playerACount,
+    playerBCount,
+    totalInvestment,
+    description: market.description ?? "",
+    comments: coerceNumber(market.comments),
+    playerA: playerAEntries,
+    playerB: playerBEntries,
+    onChainId,
+    outcome: normaliseOutcomeValue(market.outcome),
+    resolutionStatus: normaliseResolutionStatus(
+      (market as any).resolutionStatus ?? market.resolutionStatus
+    ),
+    resolvedAt: coerceDateString((market as any).resolvedAt),
+    resolutionSource:
+      typeof (market as any).resolutionSource === "string"
+        ? (market as any).resolutionSource
+        : undefined,
+  };
+};
+
 interface GlobalContextType {
   activeTab: MarketStatus;
   markets: MarketDataType[];
   setActiveTab: (tab: MarketStatus) => void;
-  formatMarketData: (data: (Partial<MarketDataType> & Record<string, any>)[]) => void;
+  formatMarketData: (
+    data: (Partial<MarketDataType> & Record<string, any>)[]
+  ) => void;
 }
 
-// Create Context
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
 
-// Create Global Provider
 export const GlobalProvider = ({ children }: { children: ReactNode }) => {
   const [activeTab, setActiveTab] = useState<MarketStatus>("ACTIVE");
   const [markets, setMarkets] = useState<MarketDataType[]>([]);
+  const socketRef = useRef<Socket | null>(null);
 
-  const formatMarketData = (data: (Partial<MarketDataType> & Record<string, any>)[]) => {
-    const normalized = data.map((market) => normalizeMarket(market));
-    setMarkets(normalized);
-  }
+  const upsertMarket = useCallback(
+    (incoming: Partial<MarketDataType> & Record<string, any>) => {
+      const normalised = normaliseMarket(incoming);
+      if (!normalised._id) {
+        return;
+      }
+      setMarkets((previous) => {
+        const index = previous.findIndex(
+          (entry) => entry._id === normalised._id
+        );
+        if (index === -1) {
+          return [normalised, ...previous];
+        }
+        const clone = [...previous];
+        clone[index] = { ...clone[index], ...normalised };
+        return clone;
+      });
+    },
+    []
+  );
+
+  const formatMarketData = useCallback(
+    (data: (Partial<MarketDataType> & Record<string, any>)[]) => {
+      const normalised = data.map((market) => normaliseMarket(market));
+      setMarkets(normalised);
+    },
+    []
+  );
+
+  useEffect(() => {
+    const socketUrl = deriveSocketUrl();
+    const socket = io(socketUrl, {
+      transports: ["websocket"],
+      autoConnect: true,
+      reconnection: true,
+    });
+    socketRef.current = socket;
+
+    const handleMarketUpdate = (market: Partial<MarketDataType>) => {
+      upsertMarket(market);
+    };
+
+    socket.on("market:update", handleMarketUpdate);
+
+    return () => {
+      socket.off("market:update", handleMarketUpdate);
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [upsertMarket]);
 
   return (
-    <GlobalContext.Provider value={{ activeTab, markets, setActiveTab, formatMarketData }}>
+    <GlobalContext.Provider
+      value={{ activeTab, markets, setActiveTab, formatMarketData }}
+    >
       {children}
     </GlobalContext.Provider>
   );
 };
 
-// Custom Hook to use Global Context
 export const useGlobalContext = () => {
   const context = useContext(GlobalContext);
   if (!context) {
@@ -111,4 +258,3 @@ export const useGlobalContext = () => {
   }
   return context;
 };
-

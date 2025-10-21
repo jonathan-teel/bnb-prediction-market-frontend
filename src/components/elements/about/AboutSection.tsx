@@ -31,7 +31,7 @@ const aboutAnswers = [
     title: "How do I participate?",
     content: [
       "To participate, connect your wallet and explore the available markets. Buy shares in outcomes you believe in, create markets of your own, and track your performance from an intuitive dashboard.",
-      "Getting started is simple: connect a supported wallet, load it with funds, and browse active markets by category or closing time. If inspiration strikes, submit a new market and invite others to join. Help resources and community support are always nearby.",
+      "Getting started is simple: connect MetaMask, Trust Wallet, or any WalletConnect-compatible wallet, load it with funds, and browse active markets by category or closing time. If inspiration strikes, submit a new market and invite others to join. Help resources and community support are always nearby.",
     ],
   },
   {
