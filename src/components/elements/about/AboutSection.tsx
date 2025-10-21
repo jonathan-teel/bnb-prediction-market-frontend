@@ -35,10 +35,10 @@ const aboutAnswers = [
     ],
   },
   {
-    title: "What does funding a market do?",
+    title: "How do markets go live?",
     content: [
-      "Funding supplies the liquidity pool that traders use. When you add BNB to a market the funds stay on-chain and back the YES and NO shares so other users can trade immediately. The first successful funding transaction moves a market from pending to active on the home page.",
-      "Funders receive liquidity shares and a cut of trading fees. You can contribute a small or large amount, adjust your position before the event closes, or stay through settlement to collect fees. Funding lets you help launch markets while earning along the way.",
+      "Once a market is created and approved it appears in the active list immediately. Traders can begin placing YES or NO positions right away, with odds updating as the crowd participates.",
+      "If a market requires additional details the team may hold it in the pending view temporarily, but no separate funding step is required. Everything moves on-chain the moment the market is published.",
     ],
   },
   {

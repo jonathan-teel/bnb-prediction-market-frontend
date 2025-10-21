@@ -41,7 +41,7 @@ export default function Home() {
           <div className="flex items-center justify-between rounded-2xl border border-[#1f242c] bg-[#11161c] px-5 py-4">
             <div>
               <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
-              <p className="text-xs text-[#5f6b7a]">Live trades, liquidity adds, and market updates</p>
+              <p className="text-xs text-[#5f6b7a]">Live trades, market updates, and resolutions</p>
             </div>
             <button
               type="button"

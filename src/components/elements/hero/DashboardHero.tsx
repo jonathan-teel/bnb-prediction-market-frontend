@@ -74,10 +74,10 @@ const DashboardHero: React.FC = () => {
               Create Market
             </Link>
             <Link
-              href="/fund"
+              href="/"
               className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/0 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--text-muted)] transition-all duration-300 hover:border-primary/40 hover:bg-white/5 hover:text-white"
             >
-              Explore Markets
+              Browse Markets
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-primary/50 bg-white/5 text-xs text-primary">
                 &gt;
               </span>

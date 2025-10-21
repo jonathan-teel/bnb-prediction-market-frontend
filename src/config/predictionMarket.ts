@@ -2,7 +2,7 @@
 
 import { TARGET_CHAIN_ID } from "@/config/network";
 
-const fallbackAddress = "0xbFE71302361596be1F789fd789ad4eaF7cb63913";
+const fallbackAddress = "0x00eB43836997c6365292aaB44a8add565a54798c";
 
 const resolveEnv = (key: string): string | undefined => {
   if (typeof process === "undefined" || !process.env) return undefined;

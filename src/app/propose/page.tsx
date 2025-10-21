@@ -341,7 +341,7 @@ export default function Propose() {
 
       if (res.status === 200) {
         infoAlert("Market created successfully!");
-        router.push(`/fund`);
+        router.push(`/`);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

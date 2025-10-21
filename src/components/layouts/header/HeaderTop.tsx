@@ -13,7 +13,6 @@ import { TARGET_NETWORK } from "@/config/network";
 
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: "Markets", href: "/" },
-  { label: "Fund", href: "/fund" },
   { label: "Create", href: "/propose" },
   { label: "Referral", href: "/referral" },
   { label: "Profile", href: "/profile" },

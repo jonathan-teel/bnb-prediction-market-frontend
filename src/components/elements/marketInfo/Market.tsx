@@ -6,7 +6,6 @@ import PredictionCard from "./PredictionCard";
 import PendingCard from "./PendingCard";
 import Navbar from "../Navbar";
 import axios, { AxiosResponse } from "axios";
-import { usePathname } from "next/navigation";
 import { API_BASE_URL } from "@/config/api";
 
 interface MarketProps {
@@ -16,7 +15,6 @@ interface MarketProps {
 
 const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRecentActivity }) => {
   const { markets, activeTab, formatMarketData } = useGlobalContext();
-  const pathname = usePathname();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState<string>("Trending");
   const [total, setTotal] = useState(0);
@@ -33,15 +31,10 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
         }
       };
       const fieldQuery = selectedCategory === "Sports" ? 1 : 0;
-      if (pathname === "/fund") {
-        marketData = await axios.get(
-          `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=PENDING&marketField=${fieldQuery}`
-        );
-      } else if (pathname === "/") {
-        marketData = await axios.get(
-          `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=ACTIVE&marketField=${fieldQuery}`
-        );
-      }
+      const marketStatus = activeTab === "PENDING" ? "PENDING" : "ACTIVE";
+      marketData = await axios.get(
+        `${API_BASE_URL}/market/get?page=${currentPage}&limit=10&marketStatus=${marketStatus}&marketField=${fieldQuery}`
+      );
 
       if (marketData.data?.total !== undefined) {
         setTotal(marketData.data.total);
@@ -52,7 +45,7 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
         formatMarketData([]);
       }
     })()
-  }, [pathname, selectedCategory, currentPage])
+  }, [activeTab, selectedCategory, currentPage])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -88,13 +81,13 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
         onToggleRecentActivity={onToggleRecentActivity}
       />
       <div className={`grid w-full grid-cols-1 gap-4 ${
-        pathname === "/fund" 
-          ? "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3" 
+        activeTab === "PENDING"
+          ? "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3"
           : showRecentActivity
             ? "md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-2"
             : "md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3"
       }`}>
-        {filteredMarkets.map((prediction, index) =>
+        {filteredMarkets.map((prediction) =>
           activeTab === "ACTIVE" ? (
             <PredictionCard
               key={prediction._id}
@@ -104,7 +97,6 @@ const Market: React.FC<MarketProps> = ({ showRecentActivity = true, onToggleRece
           ) : (
             <PendingCard
               key={prediction._id}
-              index={markets.indexOf(prediction)}
               category={prediction.feedName}
               question={prediction.question}
               imageUrl={prediction.imageUrl}

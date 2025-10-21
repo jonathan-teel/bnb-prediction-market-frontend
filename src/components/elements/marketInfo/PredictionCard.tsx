@@ -28,6 +28,9 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
   const { markets, formatMarketData } = useGlobalContext(); // Use Global Context
   const { address, connected } = useWallet();
   const [counter, setCounter] = useState("7d : 6h : 21m : 46s");
+  const [stakeAmount, setStakeAmount] = useState<string>("0.10");
+  const [isBetting, setIsBetting] = useState(false);
+
   useEffect(() => {
     const interval = setInterval(() => {
       let remainTime: string = getCountDown(markets[index].date);
@@ -39,12 +42,21 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
 
   const onVote = async (isYes: boolean) => {
     try {
+      if (isBetting) {
+        return;
+      }
       if (!connected || !address) {
         errorAlert("Please connect your wallet before placing a bet.");
         return;
       }
 
-      const stakeAmount = 1; // BNB amount staked (can be adjusted or made dynamic)
+      const amount = Number(stakeAmount);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        errorAlert("Enter a valid stake amount greater than zero.");
+        return;
+      }
+
+      setIsBetting(true);
 
       const marketIdentifier =
         (markets[index] as any)?.onChainId ??
@@ -69,7 +81,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
           player: address,
           market_id: markets[index]._id,
           onChainId: marketIdentifier,
-          amount: stakeAmount,
+          amount,
           isYes,
           currentPage,
           signature: txResult.hash,
@@ -84,10 +96,13 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
         formatMarketData(marketData.data.data as MarketDataType[]);
       } catch (apiError) {
         console.warn("Betting API sync failed:", apiError);
+        errorAlert("Bet placed on-chain, but backend sync failed.");
       }
     } catch (error) {
       console.log(error);
       errorAlert("Betting transaction failed.");
+    } finally {
+      setIsBetting(false);
     }
   }
   return (
@@ -147,29 +162,59 @@ const PredictionCard: React.FC<PredictionCardProps> = ({
         </div>
       </div>
 
+      <div className="self-stretch flex flex-col gap-2">
+        <label htmlFor={`stake-${markets[index]._id}`} className="text-[#9EA5B5] text-sm font-semibold">
+          Stake Amount (BNB)
+        </label>
+        <div className="flex items-center gap-3 rounded-2xl border border-[#1f242c] bg-[#12161f] px-4 py-2.5 focus-within:border-[#FCD535] transition-colors">
+          <input
+            id={`stake-${markets[index]._id}`}
+            type="number"
+            min="0"
+            step="0.01"
+            value={stakeAmount}
+            onChange={(event) => setStakeAmount(event.target.value)}
+            className="w-full bg-transparent text-white text-base font-medium font-satoshi outline-none"
+            placeholder="0.00"
+            inputMode="decimal"
+          />
+          <span className="text-[#9EA5B5] text-sm font-semibold">BNB</span>
+        </div>
+      </div>
+
       {/* Yes/No Buttons */}
       <div className="self-stretch flex flex-col sm:flex-row justify-start items-stretch gap-3">
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="w-full sm:flex-1 px-4 py-2.5 bg-[#223a25] outline outline-[#FCD535] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
+          disabled={isBetting}
+          className={`w-full sm:flex-1 px-4 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2 ${
+            isBetting ? "bg-[#223a25]/60 opacity-70 cursor-not-allowed" : "bg-[#223a25] outline outline-[#FCD535]"
+          }`}
           onClick={() => onVote(true)}
         >
           <span className="w-5 h-5 flex items-center justify-center">
             <Icon name="yes" color="#FCD535" />
           </span>
-          <span className="text-[#FCD535] text-lg font-bold font-satoshi leading-7">Yes</span>
+          <span className="text-[#FCD535] text-lg font-bold font-satoshi leading-7">
+            {isBetting ? "Placing..." : "Yes"}
+          </span>
         </motion.button>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="w-full sm:flex-1 px-4 py-2.5 bg-[#3a2222] outline outline-[#ff6464] rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2"
+          disabled={isBetting}
+          className={`w-full sm:flex-1 px-4 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 flex justify-center items-center gap-2 ${
+            isBetting ? "bg-[#3a2222]/60 opacity-70 cursor-not-allowed" : "bg-[#3a2222] outline outline-[#ff6464]"
+          }`}
           onClick={() => onVote(false)}
         >
           <span className="w-5 h-5 flex items-center justify-center">
             <Icon name="no" color="#ff6464" />
           </span>
-          <span className="text-[#ff6464] text-lg font-bold font-satoshi leading-7">No</span>
+          <span className="text-[#ff6464] text-lg font-bold font-satoshi leading-7">
+            {isBetting ? "Placing..." : "No"}
+          </span>
         </motion.button>
       </div>
     </motion.div>
